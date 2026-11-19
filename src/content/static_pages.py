@@ -5,6 +5,7 @@
 """
 
 from content.pages_data import TOOLS
+from content.guides_data import GUIDES
 
 
 def render_home_body(cfg):
@@ -131,6 +132,34 @@ def render_home_body(cfg):
                 <h3>도장 만들기 → 서식 날인 원스톱 연동</h3>
                 <p>도장 사이트와 서식 사이트를 따로 오갈 필요가 없습니다. 온라인에서 만든 고화질 투명 PNG 도장을 내 도장함에 저장해 두고 7종 서식 어디에나 크기 조절과 함께 즉시 날인할 수 있습니다.</p>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" style="padding-top:12px;">
+          <div class="container">
+            <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;">
+              <div>
+                <h2>서류 작성 전 꼭 읽어야 할 실무 가이드</h2>
+                <p>2026년 최신 법령 기준으로 퇴사·금전거래·근로계약·부가세·위임장·전자도장 핵심 규정을 알기 쉽게 정리했습니다.</p>
+              </div>
+              <a href="/guide/" class="btn btn-outline btn-sm">전체 가이드 보기 →</a>
+            </div>
+            <div class="features-3col">
+              {''.join(
+                  f'''
+                  <a href="/guide/{g['slug']}/" class="tool-card" style="padding:18px;">
+                    <div class="tool-card-top" style="margin-bottom:8px;">
+                      <span class="tool-tag">{g['category']}</span>
+                      <span style="font-size:12px;color:var(--text-muted);">{g['read_time']}</span>
+                    </div>
+                    <h3 style="font-size:16px;line-height:1.45;margin-bottom:8px;">{g['title']}</h3>
+                    <p style="font-size:13.5px;margin-bottom:10px;">{g['summary']}</p>
+                    <span class="tool-card-cta">가이드 읽기 →</span>
+                  </a>
+                  '''
+                  for g in GUIDES
+              )}
             </div>
           </div>
         </section>
@@ -281,24 +310,37 @@ def render_contact_body(cfg):
           <h1>문의하기</h1>
           <div class="static-meta">{cfg['site_name']} 오류 제보 · 신규 서식 요청 · 제휴 및 광고 문의</div>
 
-          <p>{cfg['site_name']}를 이용해 주셔서 감사합니다. 서비스 이용 중 불편한 점, 법령 변경에 따른 서식 업데이트 제안, 새로 추가되었으면 하는 무료 서식 아이디어가 있으시면 아래 이메일로 편하게 연락해 주세요.</p>
+          <p>{cfg['site_name']}를 이용해 주셔서 감사합니다. 서비스 이용 중 발생하는 인쇄·PDF 오류 제보, 법령 개정에 따른 서식 및 가이드 업데이트 제안, 새로 추가되었으면 하는 무료 서식 아이디어가 있으시면 아래 공식 이메일로 편하게 연락해 주세요.</p>
 
           <div class="guide-callout" style="margin:24px 0;">
             <strong>공식 문의 이메일</strong>
-            <p style="margin:6px 0 0;font-size:16px;">
+            <p style="margin:6px 0 4px;font-size:16px;">
               <a href="mailto:{cfg['contact_email']}" style="color:var(--brand-blue);font-weight:800;text-decoration:underline;">{cfg['contact_email']}</a>
             </p>
+            <p style="margin:0;font-size:13px;color:var(--text-secondary);">운영시간: 평일 09:00 ~ 18:00 (주말·공휴일 제외) · 평균 회신 기간: 영업일 기준 1~3일 이내</p>
           </div>
 
-          <h2>자주 접수되는 문의 유형</h2>
+          <h2>자주 접수되는 문의 유형 및 빠른 처리 안내</h2>
           <ul>
-            <li><strong>오류 제보:</strong> 특정 브라우저나 모바일 기기에서 A4 인쇄 레이아웃이 어긋나거나 계산 오류가 발생하는 경우, 사용 중인 기기/브라우저와 함께 알려주시면 빠르게 수정합니다.</li>
-            <li><strong>신규 서식 요청:</strong> 경력증명서, 영수증, 내용증명, 퇴직금 계산기 등 추가로 필요한 무료 문서 도구를 제안해 주세요.</li>
-            <li><strong>비즈니스 및 광고 제휴:</strong> 기업용 맞춤 서식 연동 또는 광고 제휴 관련 문의를 환영합니다.</li>
+            <li><strong>오류 제보:</strong> 특정 브라우저(크롬·엣지·사파리·웨일 등)나 모바일 기기에서 A4 인쇄 여백이 어긋나거나 계산·도장 날인 오류가 발생하는 경우, 사용 중인 <em>기기/브라우저 이름과 문제가 발생한 서식 페이지 주소</em>를 함께 보내주시면 가장 빠르게 수정합니다.</li>
+            <li><strong>신규 무료 서식 요청:</strong> 경력증명서, 영수증, 내용증명, 퇴직금 정산서, 발주서 등 실무에서 자주 쓰이는 무료 A4 서식 아이디어를 제안해 주시면 우선순위를 검토해 반영합니다.</li>
+            <li><strong>법령·콘텐츠 정정 요청:</strong> 실무 가이드나 FAQ 내용 중 법령 개정·수치 변동이 필요한 부분을 알려주시면 확인 즉시 최신화합니다.</li>
+            <li><strong>비즈니스·제휴·광고 문의:</strong> 기업용 맞춤 서식 연동 및 광고 제휴 관련 문의를 환영합니다.</li>
           </ul>
 
-          <h2>답변 안내</h2>
-          <p>접수된 문의는 영업일 기준 1~3일 이내에 확인 후 회신드립니다. <strong>※ 법률·노무·세무 분쟁에 대한 개별 상담은 제공하지 않으므로</strong> 대한법률구조공단(132), 고용노동부 상담센터(1350), 국세상담센터(126) 등 전문 기관을 이용해 주시기 바랍니다.</p>
+          <h2>개별 법률·노무·세무 상담 안내 (공공 무료 상담 기관)</h2>
+          <p>{cfg['site_name']}는 표준 서식 작성 도구와 일반 실무 정보를 제공하는 서비스로, 개별 분쟁에 대한 법률·노무·세무 자문은 진행하지 않습니다. 구체적인 분쟁 해결이 필요하신 경우 아래 정부 공공 무료 상담 센터를 이용해 주세요.</p>
+          <table class="guide-table">
+            <thead>
+              <tr><th style="width:28%">기관명</th><th style="width:20%">대표번호</th><th>주요 무료 상담 분야</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>고용노동부 고객상담센터</strong></td><td>국번 없이 <strong>1350</strong></td><td>임금체불, 퇴직금, 최저임금, 근로계약서, 실업급여</td></tr>
+              <tr><td><strong>대한법률구조공단</strong></td><td>국번 없이 <strong>132</strong></td><td>차용증 금전 분쟁, 지급명령, 민사소송, 위임·계약 법률 상담</td></tr>
+              <tr><td><strong>국세상담센터 (홈택스)</strong></td><td>국번 없이 <strong>126</strong></td><td>세금계산서, 부가가치세, 가족 간 차용증 증여세, 원천징수</td></tr>
+              <tr><td><strong>정부24 민원콜센터</strong></td><td><strong>1588-2188</strong></td><td>주민등록등·초본, 가족관계증명서, 인감 대리발급 민원 안내</td></tr>
+            </tbody>
+          </table>
         </article>
       </div>
     </section>

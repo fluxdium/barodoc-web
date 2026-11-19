@@ -70,8 +70,8 @@
       if (!previewContainer) return;
       const html = def.renderA4(state, {
         fontClass: fontMode === 'gothic' ? 'font-gothic' : '',
-        renderStamp: (slotKey, label) =>
-          stampWidget ? stampWidget.renderStampHtml(slotKey, label) : `<span>${U.escapeHtml(label || '(인)')}</span>`,
+        renderStamp: (slotKey, label, extraClass) =>
+          stampWidget ? stampWidget.renderStampHtml(slotKey, label, extraClass) : `<span>${U.escapeHtml(label || '(인)')}</span>`,
       });
       previewContainer.innerHTML = html;
       requestAnimationFrame(rescaleA4);

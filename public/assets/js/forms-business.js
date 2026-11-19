@@ -159,13 +159,19 @@
     });
   }
 
+  function makeCompanyStampName(companyName, fallback) {
+    if (!companyName) return fallback;
+    const core = String(companyName).replace(/주식회사|\(주\)|유한회사|\s+/g, '');
+    return (core.slice(0, 8) || fallback.replace(/인$/, '')) + '인';
+  }
+
   /* ========================================================================
      5. 견적서 (gyeonjeokseo)
      ======================================================================== */
   F.register('gyeonjeokseo', {
     stampSlots: [{ key: 'supplier', label: '공급자 직인', defaultName: '바로스튜디오인', defaultShape: 'square', sizeMm: 19 }],
     defaultStampMm: 19,
-    getSuggestedStampName: (s) => (s.supplierName ? s.supplierName.replace(/\s+/g, '') + '인' : '바로스튜디오인'),
+    getSuggestedStampName: (s) => makeCompanyStampName(s.supplierName, '바로스튜디오인'),
     getInitialData: () => ({
       quoteNo: 'Q-2026-001',
       quoteDate: U.todayISO(),
@@ -326,9 +332,10 @@
 
       const vatLabel =
         s.vatMode === 'exempt' ? '(면세)' : s.vatMode === 'included' ? '(부가세 포함)' : '(부가세 포함 총액)';
+      const denseClass = totals.rows.length >= 7 ? 'dense-items' : '';
 
       return `
-        <div class="a4-sheet ${ctx.fontClass}" style="padding:14mm 14mm 13mm;">
+        <div class="a4-sheet ${denseClass} ${ctx.fontClass}" style="padding:14mm 14mm 13mm;">
           <h2 class="doc-title compact">견 적 서</h2>
 
           <div class="biz-header">
@@ -350,7 +357,7 @@
             </div>
 
             <table class="doc-table compact thick-outer" style="margin:0;">
-              <colgroup><col style="width:10%"><col style="width:22%"><col style="width:28%"><col style="width:16%"><col style="width:24%"></colgroup>
+              <colgroup><col style="width:9%"><col style="width:19%"><col style="width:27%"><col style="width:14%"><col style="width:31%"></colgroup>
               <tr>
                 <th rowspan="5" style="line-height:1.4;">공<br>급<br>자</th>
                 <th>등록번호</th>
@@ -360,9 +367,11 @@
                 <th>상 호</th>
                 <td class="bold">${valOrEmpty(s.supplierName, '회사명')}</td>
                 <th>성 명</th>
-                <td style="position:relative;">
-                  ${valOrEmpty(s.supplierCeo, '대표자')}
-                  <span style="position:absolute;right:1mm;top:50%;transform:translateY(-50%);">${ctx.renderStamp('supplier', '(인)')}</span>
+                <td>
+                  <div class="ceo-stamp-cell">
+                    <span>${valOrEmpty(s.supplierCeo, '대표자')}</span>
+                    ${ctx.renderStamp('supplier', '(인)', 'sm')}
+                  </div>
                 </td>
               </tr>
               <tr>
@@ -418,10 +427,7 @@
             </tfoot>
           </table>
 
-          <div class="doc-notes-box" style="margin-top:auto;">
-            <strong>[특기사항 및 결제 안내]</strong>
-            ${U.escapeHtml(s.notes || '특이사항 없음')}
-          </div>
+          <div class="doc-notes-box" style="margin-top:auto;"><strong>[특기사항 및 결제 안내]</strong><div class="doc-notes-body">${U.escapeHtml(s.notes || '특이사항 없음')}</div></div>
         </div>
       `;
     },
@@ -435,7 +441,7 @@
       { key: 'employer', label: '사업주 직인/인', defaultName: '바로컴퍼니인', defaultShape: 'square', sizeMm: 17 },
       { key: 'employee', label: '근로자 도장 (인)', defaultName: '김근로', defaultShape: 'circle', sizeMm: 16 },
     ],
-    getSuggestedStampName: (s, slot) => (slot === 'employer' ? s.companyName || '바로컴퍼니인' : s.employeeName || '김근로'),
+    getSuggestedStampName: (s, slot) => (slot === 'employer' ? makeCompanyStampName(s.companyName, '바로컴퍼니인') : s.employeeName || '김근로'),
     getInitialData: () => ({
       contractType: 'permanent', // permanent | fixed | parttime
       companyName: '',
@@ -488,7 +494,7 @@
       wageAmount: '2800000',
       bonusText: '경영 성과에 따라 별도 지급',
       allowanceText: '비과세 식대 월 200,000원 포함',
-      payDay: '매월 25일 (휴일인 경우 전영업일)',
+      payDay: '매월 25일',
       payMethod: '근로자 명의 예금통장에 입금',
       insEmployment: true,
       insAccident: true,
@@ -698,7 +704,7 @@
             <div style="padding-left:4mm;margin-top:1mm;">
               - ${wageLabelMap[s.wageType] || '월급'} : <strong>${U.formatNumber(amt)}원</strong> (${U.escapeHtml(U.formatKoreanCurrency(amt))})<br>
               - 상여금 및 제수당 : ${U.escapeHtml(s.allowanceText || '별도 약정 없음')}<br>
-              - 임금지급일 : ${U.escapeHtml(s.payDay || '매월 25일')} (휴일의 경우는 전일 지급)<br>
+              - 임금지급일 : ${U.escapeHtml(s.payDay || '매월 25일')}${/(휴일|전일|전영업일)/.test(s.payDay || '') ? '' : ' (휴일의 경우는 전일 지급)'}<br>
               - 지급방법 : ${U.escapeHtml(s.payMethod || '근로자 명의 예금통장에 입금')}
             </div>
           </div>
@@ -789,7 +795,7 @@
   F.register('georae', {
     stampSlots: [{ key: 'supplier', label: '공급자 직인', defaultName: '바로유통인', defaultShape: 'square', sizeMm: 19 }],
     defaultStampMm: 19,
-    getSuggestedStampName: (s) => (s.supplierName ? s.supplierName.replace(/\s+/g, '') + '인' : '바로유통인'),
+    getSuggestedStampName: (s) => makeCompanyStampName(s.supplierName, '바로유통인'),
     getInitialData: () => ({
       copyMode: 'blue', // blue (공급받는자 보관용) | red (공급자 보관용) | both (2매 동시 출력)
       tradeDate: U.todayISO(),
@@ -969,10 +975,11 @@
         }
       }
 
+      const denseClass = totals.rows.length >= 7 ? 'dense-items' : '';
       return copies
         .map(
           (copy) => `
-          <div class="a4-sheet ${copy.theme} ${ctx.fontClass}" style="padding:14mm 14mm 13mm;">
+          <div class="a4-sheet ${denseClass} ${copy.theme} ${ctx.fontClass}" style="padding:14mm 14mm 13mm;">
             <h2 class="doc-title compact">
               거 래 명 세 서
               <span class="statement-copy-badge">${copy.label}</span>
@@ -997,7 +1004,7 @@
               </div>
 
               <table class="doc-table compact thick-outer" style="margin:0;">
-                <colgroup><col style="width:10%"><col style="width:22%"><col style="width:28%"><col style="width:16%"><col style="width:24%"></colgroup>
+                <colgroup><col style="width:9%"><col style="width:19%"><col style="width:27%"><col style="width:14%"><col style="width:31%"></colgroup>
                 <tr>
                   <th rowspan="5" style="line-height:1.4;">공<br>급<br>자</th>
                   <th>등록번호</th>
@@ -1007,9 +1014,11 @@
                   <th>상 호</th>
                   <td class="bold">${valOrEmpty(s.supplierName, '공급자 상호')}</td>
                   <th>성 명</th>
-                  <td style="position:relative;">
-                    ${valOrEmpty(s.supplierCeo, '대표자')}
-                    <span style="position:absolute;right:1mm;top:50%;transform:translateY(-50%);">${ctx.renderStamp('supplier', '(인)')}</span>
+                  <td>
+                    <div class="ceo-stamp-cell">
+                      <span>${valOrEmpty(s.supplierCeo, '대표자')}</span>
+                      ${ctx.renderStamp('supplier', '(인)', 'sm')}
+                    </div>
                   </td>
                 </tr>
                 <tr>
@@ -1066,14 +1075,11 @@
             </table>
 
             <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:4mm;margin-top:auto;">
-              <div class="doc-notes-box">
-                <strong>[비고 / 입금 안내]</strong>
-                ${U.escapeHtml(s.notes || '')}
-              </div>
+              <div class="doc-notes-box"><strong>[비고 / 입금 안내]</strong><div class="doc-notes-body">${U.escapeHtml(s.notes || '')}</div></div>
               <table class="doc-table compact" style="margin:0;">
                 <tr>
                   <th style="width:34%">인수자 확인</th>
-                  <td class="center" style="height:18mm;vertical-align:bottom;color:#666;">성명 : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(인)</td>
+                  <td class="center" style="height:${totals.rows.length >= 7 ? '12mm' : '16mm'};vertical-align:bottom;color:#666;">성명 : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(인)</td>
                 </tr>
               </table>
             </div>

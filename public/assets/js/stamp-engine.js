@@ -227,13 +227,13 @@
       const box = { x: innerPad, y: innerPad, w: innerSize, h: innerSize };
 
       if (chars.length <= 2) {
-        drawGridChars(ctx, chars, chars.length === 1 ? 1 : 2, 1, box, cfg.font, scale * 0.92, color);
+        drawGridChars(ctx, chars, chars.length === 1 ? 1 : 2, 1, box, cfg.font, scale * 0.9, color);
       } else if (chars.length <= 4) {
-        drawGridChars(ctx, chars, 2, 2, box, cfg.font, scale * 0.96, color);
+        drawGridChars(ctx, chars, 2, 2, box, cfg.font, scale * 0.92, color);
       } else if (chars.length <= 6) {
-        drawGridChars(ctx, chars, 2, 3, box, cfg.font, scale * 0.95, color);
+        drawGridChars(ctx, chars, 2, 3, box, cfg.font, scale * 0.88, color);
       } else {
-        drawGridChars(ctx, chars, 3, 3, box, cfg.font, scale * 0.94, color);
+        drawGridChars(ctx, chars, 3, 3, box, cfg.font, scale * 0.82, color);
       }
     } else {
       // 원형 도장 (기본)
@@ -296,7 +296,7 @@
           3,
           { x: cx - 162, y: cy - 162, w: 324, h: 324 },
           cfg.font,
-          scale * 0.9,
+          scale * 0.8,
           color
         );
       }

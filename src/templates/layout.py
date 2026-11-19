@@ -67,6 +67,10 @@ def build_base_html(
                 f'<a class="mobile-drawer-link{is_active}" href="/{t["slug"]}/">{t["short_name"]} 양식</a>'
             )
 
+    guide_active = " active" if active_slug == "guide" else ""
+    nav_links.append(f'<a class="nav-link{guide_active}" href="/guide/">실무 가이드</a>')
+    mobile_links.append(f'<a class="mobile-drawer-link{guide_active}" href="/guide/">실무 가이드</a>')
+
     footer_tool_links = "".join(
         f'<li><a href="/{t["slug"]}/">{t["short_name"] if t["kind"] == "stamp" else t["short_name"] + " 양식"}</a></li>'
         for t in TOOLS
@@ -169,6 +173,7 @@ def build_base_html(
         <div class="footer-col">
           <h4>사이트 안내</h4>
           <ul class="footer-links single-col">
+            <li><a href="/guide/">실무 가이드 모음</a></li>
             <li><a href="/about/">사이트 소개</a></li>
             <li><a href="/privacy/">개인정보처리방침</a></li>
             <li><a href="/terms/">이용약관 및 법적 면책고지</a></li>
@@ -402,9 +407,9 @@ def build_stamp_page_body(tool):
 
                 <div id="inMarkWrap" class="field">
                   <div class="field-row" style="align-items:center;">
-                    <label class="checkbox-row">
+                    <label class="checkbox-row" style="white-space:nowrap;">
                       <input type="checkbox" id="stampAddIn" checked>
-                      3글자 이름에 印 자동 추가 (2×2)
+                      3글자 印 자동 추가
                     </label>
                     <select id="stampInChar" aria-label="인 글자 선택">
                       <option value="印" selected>한자 '印'</option>
@@ -508,3 +513,93 @@ def build_stamp_page_body(tool):
 
     {build_editorial_section(tool)}
     """
+
+
+def build_guide_index_body(cfg, guides):
+    cards = "".join(
+        f"""
+        <a class="tool-card" href="/guide/{g['slug']}/" style="padding:22px;">
+          <div class="tool-card-top">
+            <span class="tool-tag">{g['category']}</span>
+            <span style="font-size:12px;color:var(--text-muted);">{g['read_time']}</span>
+          </div>
+          <h2 style="margin:0 0 8px;font-size:18px;line-height:1.4;color:var(--brand-navy);">{g['title']}</h2>
+          <p style="margin:0 0 14px;font-size:14px;color:var(--text-secondary);">{g['summary']}</p>
+          <span class="tool-card-cta">자세히 읽기 →</span>
+        </a>
+        """
+        for g in guides
+    )
+    return f"""
+    <section class="page-hero">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="현재 위치">
+          <a href="/">홈</a>
+          <span>›</span>
+          <span aria-current="page">실무 가이드</span>
+        </nav>
+        <h1>한국 표준 서식 · 법령 실무 가이드</h1>
+        <p class="page-subtitle">2026년 최신 법령 기준으로 퇴사·차용증·근로계약·부가세·위임장·전자 도장 작성 시 반드시 알아야 할 핵심 규정을 정리했습니다.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="features-3col">
+          {cards}
+        </div>
+      </div>
+    </section>
+    """
+
+
+def build_guide_article_body(cfg, guide, all_guides):
+    other_links = "".join(
+        f'<li><a href="/guide/{g["slug"]}/"><span>{g["title"]}</span><span>→</span></a></li>'
+        for g in all_guides
+        if g["slug"] != guide["slug"]
+    )
+    return f"""
+    <section class="page-hero">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="현재 위치">
+          <a href="/">홈</a>
+          <span>›</span>
+          <a href="/guide/">실무 가이드</a>
+          <span>›</span>
+          <span aria-current="page">{guide['category']}</span>
+        </nav>
+        <h1>{guide['title']}</h1>
+        <p class="page-subtitle">카테고리: {guide['category']} · 읽는 시간 {guide['read_time']} · 기준일 {cfg['last_modified']}</p>
+      </div>
+    </section>
+
+    <section class="editorial-section" style="border-top:none;padding-top:32px;">
+      <div class="container editorial-grid">
+        <article class="guide-article">
+          {guide['body_html']}
+
+          <div class="guide-callout" style="margin-top:28px;">
+            <strong>지금 바로 무료 A4 서식으로 작성해 보세요</strong>
+            <p style="margin:6px 0 12px;">회원가입 없이 브라우저에서 빈칸만 채우고 도장을 찍어 깨끗한 A4 PDF로 저장할 수 있습니다.</p>
+            <a href="/{guide['related_tool']}/" class="btn btn-primary btn-sm">{guide['related_tool_name']} 바로가기 →</a>
+          </div>
+        </article>
+
+        <aside class="editorial-aside" aria-label="관련 도구 및 가이드">
+          <div class="aside-card aside-stamp-cta">
+            <h3>관련 무료 작성 도구</h3>
+            <p>이 가이드의 내용을 바탕으로 바로 문서를 작성하고 A4 PDF로 저장할 수 있습니다.</p>
+            <a href="/{guide['related_tool']}/" class="btn btn-navy btn-block btn-sm">{guide['related_tool_name']} →</a>
+          </div>
+          <div class="aside-card">
+            <h3>다른 실무 가이드</h3>
+            <ul class="aside-links">
+              {other_links}
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+    """
+

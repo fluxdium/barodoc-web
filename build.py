@@ -24,6 +24,7 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from content.pages_data import TOOLS  # noqa: E402
+from content.guides_data import GUIDES  # noqa: E402
 from content.static_pages import (  # noqa: E402
     render_404_body,
     render_about_body,
@@ -35,6 +36,8 @@ from content.static_pages import (  # noqa: E402
 from templates.layout import (  # noqa: E402
     build_base_html,
     build_form_page_body,
+    build_guide_article_body,
+    build_guide_index_body,
     build_stamp_page_body,
 )
 
@@ -179,6 +182,74 @@ def build(cfg):
             ),
         )
         sitemap_entries.append((path, "monthly", "0.9"))
+
+    # 2.5 Editorial Practical Guides (/guide/ + 6 deep articles for AdSense & SEO)
+    write_text(
+        "guide/index.html",
+        build_base_html(
+            cfg,
+            path="/guide/",
+            title=f"실무 가이드 모음 — 퇴사·차용증·근로계약·부가세·위임장·도장 | {cfg['site_name']}",
+            description="2026년 최신 법령 기준으로 사직서, 차용증, 표준근로계약서, 견적서·거래명세서 부가세, 위임장 준비물, 전자 도장 활용법을 정리한 무료 실무 가이드 모음입니다.",
+            keywords="서식 작성 가이드, 퇴사 체크리스트, 차용증 법적 효력, 2026 최저임금, 부가세 계산, 위임장 준비물, 전자 도장",
+            active_slug="guide",
+            body_html=build_guide_index_body(cfg, GUIDES),
+            json_ld_items=[
+                {
+                    "@context": "https://schema.org",
+                    "@type": "CollectionPage",
+                    "name": f"{cfg['site_name']} 실무 가이드",
+                    "url": f"{domain}/guide/",
+                    "inLanguage": "ko-KR",
+                },
+                make_breadcrumb_ld(domain, "실무 가이드", "/guide/"),
+            ],
+        ),
+    )
+    sitemap_entries.append(("/guide/", "weekly", "0.8"))
+
+    for guide in GUIDES:
+        gpath = f"/guide/{guide['slug']}/"
+        article_ld = {
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": guide["title"],
+            "description": guide["description"],
+            "url": f"{domain}{gpath}",
+            "datePublished": lastmod,
+            "dateModified": lastmod,
+            "inLanguage": "ko-KR",
+            "author": {"@type": "Organization", "name": cfg["site_name"]},
+            "publisher": {
+                "@type": "Organization",
+                "name": cfg["site_name"],
+                "logo": {"@type": "ImageObject", "url": f"{domain}/assets/img/og-image.png"},
+            },
+            "image": f"{domain}/assets/img/og-image.png",
+        }
+        crumb_ld = {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "홈", "item": f"{domain}/"},
+                {"@type": "ListItem", "position": 2, "name": "실무 가이드", "item": f"{domain}/guide/"},
+                {"@type": "ListItem", "position": 3, "name": guide["title"], "item": f"{domain}{gpath}"},
+            ],
+        }
+        write_text(
+            f"guide/{guide['slug']}/index.html",
+            build_base_html(
+                cfg,
+                path=gpath,
+                title=guide["title"],
+                description=guide["description"],
+                keywords=guide["keywords"],
+                active_slug="guide",
+                body_html=build_guide_article_body(cfg, guide, GUIDES),
+                json_ld_items=[article_ld, crumb_ld],
+            ),
+        )
+        sitemap_entries.append((gpath, "monthly", "0.8"))
 
     # 3. Trust & Policy Pages (AdSense Essential)
     static_defs = [
