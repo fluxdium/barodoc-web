@@ -1,5 +1,5 @@
 /* ==========================================================================
-   바로문서 (BaroDoc) — 3 Free Korean Practical Calculators
+   바로서식 (BaroDoc) — 3 Free Korean Practical Calculators
    1. 부가세 계산기 (/calc/vat/)
    2. 연차 계산기 (/calc/annual-leave/)
    3. 중개수수료(복비) 계산기 (/calc/brokerage/)

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   바로문서 (BaroDoc) — Business & Labor Official Forms (3 Forms)
+   바로서식 (BaroDoc) — Business & Labor Official Forms (3 Forms)
    5. 견적서 (gyeonjeokseo)
    6. 근로계약서 (geunro)
    7. 거래명세서 (georae)

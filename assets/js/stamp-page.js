@@ -1,5 +1,5 @@
 /* ==========================================================================
-   바로문서 (BaroDoc) — Dedicated Stamp Maker Page Controller (/stamp/)
+   바로서식 (BaroDoc) — Dedicated Stamp Maker Page Controller (/stamp/)
    ========================================================================== */
 
 (function (window) {
@@ -130,9 +130,9 @@
 
         // Helpful preset adjustments when switching to square company seal
         if (cfg.shape === 'square' && elText && elText.value.trim() === '홍길동') {
-          elText.value = '바로문서주식회사인';
-          cfg.text = '바로문서주식회사인';
-        } else if (cfg.shape !== 'square' && elText && elText.value.trim() === '바로문서주식회사인') {
+          elText.value = '바로서식주식회사인';
+          cfg.text = '바로서식주식회사인';
+        } else if (cfg.shape !== 'square' && elText && elText.value.trim() === '바로서식주식회사인') {
           elText.value = '홍길동';
           cfg.text = '홍길동';
         }
@@ -262,7 +262,7 @@
       btnDownload.addEventListener('click', () => {
         const dataUrl = canvas.toDataURL('image/png');
         const safeName = (cfg.text || 'stamp').replace(/[^가-힣a-zA-Z0-9_-]/g, '') || 'stamp';
-        SE.downloadDataUrl(dataUrl, `바로문서_투명도장_${safeName}.png`);
+        SE.downloadDataUrl(dataUrl, `바로서식_투명도장_${safeName}.png`);
         U.showToast('투명 배경 PNG 도장이 다운로드되었습니다.');
       });
     }

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   바로문서 (BaroDoc) — Personal & HR Official Forms (4 Forms)
+   바로서식 (BaroDoc) — Personal & HR Official Forms (4 Forms)
    1. 사직서 (sajikseo)
    2. 차용증 (chayongjeung)
    3. 위임장 (wiimjang)
