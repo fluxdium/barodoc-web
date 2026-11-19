@@ -1,5 +1,5 @@
 /* ==========================================================================
-   바로문서 (BaroDoc) — Universal Stamp Picker & Inline Quick-Stamp Widget
+   바로서식 (BaroDoc) — Universal Stamp Picker & Inline Quick-Stamp Widget
    Shared across all 7 form pages for 1-click stamp application
    ========================================================================== */
 

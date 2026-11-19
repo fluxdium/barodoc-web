@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-바로문서 (BaroDoc) — HTML5 Page Layout, SEO Meta, JSON-LD, Workbench & Stamp Templates
+바로서식 (BaroDoc) — HTML5 Page Layout, SEO Meta, JSON-LD, Workbench & Stamp Templates
 """
 
 import json
@@ -49,32 +49,25 @@ def build_base_html(
 
     robots_content = "noindex, follow" if noindex else "index, follow, max-image-preview:large, max-snippet:-1"
 
-    nav_links = []
-    mobile_links = []
-    for t in TOOLS:
-        is_active = " active" if active_slug == t["slug"] else ""
-        if t["kind"] == "stamp":
-            nav_links.append(
-                f'<a class="nav-link nav-stamp{is_active}" href="/{t["slug"]}/">● {t["short_name"]}</a>'
-            )
-            mobile_links.append(
-                f'<a class="mobile-drawer-link stamp-link{is_active}" href="/{t["slug"]}/">● 무료 온라인 {t["short_name"]} (투명 PNG)</a>'
-            )
-        else:
-            nav_links.append(
-                f'<a class="nav-link{is_active}" href="/{t["slug"]}/">{t["short_name"]}</a>'
-            )
-            mobile_links.append(
-                f'<a class="mobile-drawer-link{is_active}" href="/{t["slug"]}/">{t["short_name"]} 양식</a>'
-            )
-
+    form_slugs = {t["slug"] for t in TOOLS if t["kind"] == "form"}
+    forms_active = " active" if active_slug in form_slugs else ""
+    stamp_active = " active" if active_slug == "stamp" else ""
     calc_active = " active" if active_slug == "calc" else ""
     guide_active = " active" if active_slug == "guide" else ""
-    nav_links.append(f'<a class="nav-link{calc_active}" href="/#calculators">계산기</a>')
-    nav_links.append(f'<a class="nav-link{guide_active}" href="/guide/">실무 가이드</a>')
-    for c in CALCULATORS:
-        mobile_links.append(f'<a class="mobile-drawer-link" href="{c["path"]}">{c["short_name"]}</a>')
-    mobile_links.append(f'<a class="mobile-drawer-link{guide_active}" href="/guide/">실무 가이드</a>')
+
+    nav_links = [
+        f'<a class="nav-link{forms_active}" href="/#tools">무료 서식</a>',
+        f'<a class="nav-link nav-stamp{stamp_active}" href="/stamp/">도장 만들기</a>',
+        f'<a class="nav-link{calc_active}" href="/#calculators">실무 계산기</a>',
+        f'<a class="nav-link{guide_active}" href="/guide/">실무 가이드</a>',
+    ]
+
+    mobile_links = [
+        f'<a class="mobile-drawer-link{forms_active}" href="/#tools">무료 서식 7종</a>',
+        f'<a class="mobile-drawer-link{stamp_active}" href="/stamp/">도장 만들기</a>',
+        f'<a class="mobile-drawer-link{calc_active}" href="/#calculators">실무 계산기 3종</a>',
+        f'<a class="mobile-drawer-link{guide_active}" href="/guide/">실무 가이드</a>',
+    ]
 
     footer_tool_links = "".join(
         f'<li><a href="/{t["slug"]}/">{t["short_name"] if t["kind"] == "stamp" else t["short_name"] + " 양식"}</a></li>'
@@ -136,9 +129,8 @@ def build_base_html(
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand-logo" href="/">
-        <img src="/assets/img/favicon.svg" alt="{cfg['site_name']} 로고" width="30" height="30">
+        <img src="/assets/img/favicon.svg" alt="{cfg['site_name']} 로고" width="28" height="28">
         <span>{cfg['site_name']}</span>
-        <span class="brand-badge">무료 A4</span>
       </a>
       <nav class="main-nav" aria-label="주요 서식 및 도구 메뉴">
         {"".join(nav_links)}
@@ -560,14 +552,9 @@ def build_stamp_page_body(tool):
 def build_guide_index_body(cfg, guides):
     cards = "".join(
         f"""
-        <a class="tool-card" href="/guide/{g['slug']}/" style="padding:22px;">
-          <div class="tool-card-top">
-            <span class="tool-tag">{g['category']}</span>
-            <span style="font-size:12px;color:var(--text-muted);">{g['read_time']}</span>
-          </div>
-          <h2 style="margin:0 0 8px;font-size:18px;line-height:1.4;color:var(--brand-navy);">{g['title']}</h2>
-          <p style="margin:0 0 14px;font-size:14px;color:var(--text-secondary);">{g['summary']}</p>
-          <span class="tool-card-cta">자세히 읽기 →</span>
+        <a class="guide-simple-card" href="/guide/{g['slug']}/">
+          <h2>{g['title']}</h2>
+          <p>{g['summary']}</p>
         </a>
         """
         for g in guides
@@ -587,7 +574,7 @@ def build_guide_index_body(cfg, guides):
 
     <section class="section">
       <div class="container">
-        <div class="features-3col">
+        <div class="guide-simple-grid">
           {cards}
         </div>
       </div>

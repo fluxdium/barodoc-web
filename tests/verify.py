@@ -270,11 +270,18 @@ def run_audit():
         if found_emails:
             errors.append(f"[{html_file.relative_to(PUBLIC)}] Found exposed email address(es): {found_emails}")
 
-    # Verify Web3Forms contact form essentials
+    # Verify Web3Forms contact form essentials (keep [바로문서 문의] subject prefix intact)
     contact_html = (PUBLIC / "contact" / "index.html").read_text(encoding="utf-8")
     for required_token in ("https://api.web3forms.com/submit", 'name="access_key"', 'name="botcheck"', "[바로문서 문의]"):
         if required_token not in contact_html:
             errors.append(f"[/contact/] Missing Web3Forms token: {required_token}")
+
+    # Verify complete rebrand (바로문서 -> 바로서식) across ALL HTML files EXCEPT preserved '[바로문서 문의]'
+    for html_file in PUBLIC.rglob("*.html"):
+        raw = html_file.read_text(encoding="utf-8")
+        cleaned = raw.replace("[바로문서 문의]", "")
+        if "바로문서" in cleaned:
+            errors.append(f"[{html_file.relative_to(PUBLIC)}] Found leftover old brand '바로문서'")
 
     print("=" * 92)
     print(f"{'Route':<18} {'Title':>5} {'Desc':>5} {'Chars(no ws)':>12} {'FAQs':>5}  JSON-LD Schemas")

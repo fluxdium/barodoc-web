@@ -1,5 +1,5 @@
 /* ==========================================================================
-   바로문서 (BaroDoc) — Core Utilities
+   바로서식 (BaroDoc) — Core Utilities
    Korean/Hanja currency conversion, formatting, print helper, A4 scaler
    ========================================================================== */
 
@@ -177,6 +177,54 @@
     }, duration || 2800);
   }
 
+  function initHomeQuickSearch() {
+    const input = document.getElementById('homeQuickSearch');
+    if (!input) return;
+    const clearBtn = document.getElementById('homeSearchClear');
+    const emptyState = document.getElementById('homeSearchEmpty');
+    const resetBtn = document.getElementById('homeSearchResetBtn');
+    const cards = Array.from(document.querySelectorAll('[data-searchable-card]'));
+    const sections = Array.from(document.querySelectorAll('[data-searchable-section]'));
+
+    function applyFilter() {
+      const q = input.value.trim().toLowerCase();
+      if (clearBtn) clearBtn.classList.toggle('visible', q.length > 0);
+
+      let totalVisible = 0;
+      cards.forEach((card) => {
+        const hay = (card.getAttribute('data-search') || card.textContent || '').toLowerCase();
+        const match = !q || hay.includes(q);
+        card.style.display = match ? '' : 'none';
+        if (match) totalVisible += 1;
+      });
+
+      sections.forEach((sec) => {
+        const visibleInSec = sec.querySelectorAll('[data-searchable-card]:not([style*="display: none"])').length;
+        sec.style.display = visibleInSec > 0 ? '' : 'none';
+      });
+
+      if (emptyState) {
+        emptyState.classList.toggle('visible', totalVisible === 0);
+      }
+    }
+
+    input.addEventListener('input', applyFilter);
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        input.value = '';
+        applyFilter();
+        input.focus();
+      });
+    }
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        input.value = '';
+        applyFilter();
+        input.focus();
+      });
+    }
+  }
+
   function initCommonUI() {
     const menuBtn = document.getElementById('mobileMenuBtn');
     const drawer = document.getElementById('mobileDrawer');
@@ -186,6 +234,7 @@
         menuBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
       });
     }
+    initHomeQuickSearch();
   }
 
   function setupA4Scaler() {

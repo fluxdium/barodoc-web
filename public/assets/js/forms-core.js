@@ -1,5 +1,5 @@
 /* ==========================================================================
-   바로문서 (BaroDoc) — Form Workbench Core Runtime
+   바로서식 (BaroDoc) — Form Workbench Core Runtime
    Manages draft persistence, mobile tabs, font toggle, stamp sync, A4 print
    ========================================================================== */
 

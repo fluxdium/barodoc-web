@@ -1,5 +1,5 @@
 /* ==========================================================================
-   바로문서 (BaroDoc) — Transparent Korean Stamp Canvas Engine
+   바로서식 (BaroDoc) — Transparent Korean Stamp Canvas Engine
    Generates crisp 600x600 transparent PNG seals & manages localStorage tray
    ========================================================================== */
 

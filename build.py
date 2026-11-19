@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-바로문서 (BaroDoc) — Static Site Generator
+바로서식 (BaroDoc) — Static Site Generator
 Reads site-config.json and generates all 13 static HTML pages, 404.html,
 sitemap.xml, robots.txt, and ads.txt inside public/.
 
@@ -139,9 +139,9 @@ def build(cfg):
         build_base_html(
             cfg,
             path="/",
-            title=f"{cfg['site_name']} — 무료 A4 서식 7종 작성 & 온라인 투명 도장 만들기",
-            description="회원가입 없이 무료로 사직서·차용증·위임장·재직증명서·견적서·근로계약서·거래명세서를 작성하고, 한글 투명 도장을 바로 찍어 깨지지 않는 A4 PDF로 저장하세요.",
-            keywords="무료 서식, 사직서 양식, 차용증 양식, 위임장 양식, 재직증명서 양식, 견적서 양식, 근로계약서 양식, 거래명세서 양식, 무료 온라인 도장 만들기",
+            title=f"{cfg['site_name']} — 가입 없이 바로 쓰는 무료 서식 · 도장 · 계산기",
+            description="바로서식에서 회원가입 없이 사직서·차용증·위임장·재직증명서·견적서·근로계약서·거래명세서, 투명 도장 만들기, 부가세·연차·중개수수료 계산기를 브라우저에서 무료로 이용하고 A4 PDF로 저장하세요.",
+            keywords="바로서식, 무료 서식, 사직서 양식, 차용증 양식, 위임장 양식, 재직증명서 양식, 견적서 양식, 근로계약서 양식, 거래명세서 양식, 무료 온라인 도장 만들기, 부가세 계산기, 연차 계산기, 중개수수료 계산기",
             active_slug="",
             body_html=home_body,
             json_ld_items=home_ld,
@@ -349,7 +349,7 @@ def build(cfg):
             cfg,
             path="/404.html",
             title=f"페이지를 찾을 수 없습니다 | {cfg['site_name']}",
-            description="요청하신 페이지를 찾을 수 없습니다. 바로문서의 무료 A4 서식과 온라인 도장 도구로 이동해 보세요.",
+            description="요청하신 페이지를 찾을 수 없습니다. 바로서식의 무료 A4 서식과 온라인 도장 도구로 이동해 보세요.",
             body_html=render_404_body(cfg),
             noindex=True,
         ),
