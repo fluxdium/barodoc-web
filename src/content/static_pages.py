@@ -325,7 +325,7 @@ def render_contact_body(cfg):
 
               <div class="field">
                 <label for="inquiryType">문의 유형 <span style="color:var(--seal-red);">*</span></label>
-                <select id="inquiryType" name="문의_유형" required>
+                <select id="inquiryType" name="category" required>
                   <option value="오류 제보" selected>오류 제보</option>
                   <option value="신규 서식 요청">신규 서식 요청</option>
                   <option value="법령·내용 정정">법령·내용 정정</option>
@@ -335,7 +335,7 @@ def render_contact_body(cfg):
 
               <div class="field">
                 <label for="replyEmail">회신받을 이메일 <span style="font-weight:500;color:var(--text-muted);">(선택)</span></label>
-                <input type="email" id="replyEmail" name="email" placeholder="답변을 받으실 경우에만 이메일 주소를 입력해 주세요" autocomplete="email">
+                <input type="email" id="replyEmail" name="reply_email" placeholder="답변을 받으실 경우에만 이메일 주소를 입력해 주세요" autocomplete="email">
                 <p class="field-help">회신이 필요 없는 단순 제보나 건의는 비워 두셔도 접수됩니다.</p>
               </div>
 
