@@ -1848,6 +1848,197 @@ textarea {
 }
 
 /* ==========================================================================
+   Calculator Workbench (/calc/vat/, /calc/annual-leave/, /calc/brokerage/)
+   ========================================================================== */
+
+.calc-grid {
+  display: grid;
+  grid-template-columns: 440px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.calc-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+}
+
+.calc-mode-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  background: var(--bg-subtle);
+  padding: 5px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.calc-mode-tabs.cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.calc-mode-btn {
+  padding: 9px 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.calc-mode-btn.active {
+  background: var(--brand-navy);
+  color: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+
+.calc-result-hero {
+  background: linear-gradient(135deg, #1b365d 0%, #102442 100%);
+  color: #ffffff;
+  border-radius: var(--radius-md);
+  padding: 20px 22px;
+  margin-bottom: 16px;
+}
+
+.calc-result-label {
+  font-size: 13px;
+  color: #bfdbfe;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.calc-result-main {
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+}
+
+.calc-result-sub {
+  margin-top: 6px;
+  font-size: 13.5px;
+  color: #e2e8f0;
+}
+
+.calc-breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.calc-stat-box {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 13px 14px;
+}
+
+.calc-stat-box .lbl {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.calc-stat-box .val {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--brand-navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.calc-stat-box .sub {
+  margin-top: 3px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.calc-copy-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.calc-cta-box {
+  background: var(--brand-blue-soft);
+  border: 1px solid #bfdbfe;
+  border-radius: var(--radius-md);
+  padding: 15px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.calc-cta-box strong {
+  display: block;
+  font-size: 14px;
+  color: var(--brand-navy);
+  margin-bottom: 2px;
+}
+
+.calc-cta-box span {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.calc-cta-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.calc-table-wrap {
+  overflow-x: auto;
+  margin-top: 14px;
+}
+
+.guide-mid-cta {
+  margin: 22px 0;
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(90deg, #eff6ff 0%, #f8fafc 100%);
+  border: 1px solid #bfdbfe;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.guide-mid-cta strong {
+  display: block;
+  font-size: 15px;
+  color: var(--brand-navy);
+  margin-bottom: 2px;
+}
+
+.guide-mid-cta span {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 960px) {
+  .calc-grid {
+    grid-template-columns: 1fr;
+  }
+  .calc-breakdown-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
    Toast Notifications
    ========================================================================== */
 
