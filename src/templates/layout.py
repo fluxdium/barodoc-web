@@ -63,7 +63,7 @@ def build_base_html(
     ]
 
     mobile_links = [
-        f'<a class="mobile-drawer-link{forms_active}" href="/#tools">무료 서식 7종</a>',
+        f'<a class="mobile-drawer-link{forms_active}" href="/#tools">무료 서식 12종</a>',
         f'<a class="mobile-drawer-link{stamp_active}" href="/stamp/">도장 만들기</a>',
         f'<a class="mobile-drawer-link{calc_active}" href="/#calculators">실무 계산기 3종</a>',
         f'<a class="mobile-drawer-link{guide_active}" href="/guide/">실무 가이드</a>',
@@ -233,11 +233,16 @@ def build_editorial_section(tool):
     calc_link_map = {
         "gyeonjeokseo": ("/calc/vat/", "무료 부가세(VAT) 계산기", "공급가액 +10% 계산과 부가세 포함 역산을 1초 만에 확인해 보세요."),
         "georae": ("/calc/vat/", "무료 부가세(VAT) 계산기", "거래명세서 작성 전 공급가액과 부가세(10%)를 간편하게 계산하세요."),
+        "yeongsujeung": ("/calc/vat/", "무료 부가세(VAT) 계산기", "공급가액과 부가세(10%), 프리랜서 3.3% 세후 금액을 즉시 확인하세요."),
+        "jichul": ("/calc/vat/", "무료 부가세(VAT) 계산기", "카드 전표 총액에서 공급가액과 부가세(10%)를 빠르게 역산하세요."),
         "sajikseo": ("/calc/annual-leave/", "무료 연차 · 연차수당 계산기", "퇴사 전 남은 연차 일수와 미사용 연차수당 예상액을 미리 확인하세요."),
         "geunro": ("/calc/annual-leave/", "무료 연차 · 연차수당 계산기", "입사일·회계연도 기준 법정 연차 발생 일수를 자동으로 계산합니다."),
         "jaejik": ("/calc/annual-leave/", "무료 연차 · 연차수당 계산기", "입사일 기준 근속연차와 미사용 연차수당을 간편하게 확인하세요."),
+        "gyeongryeok": ("/calc/annual-leave/", "무료 연차 · 연차수당 계산기", "퇴사 시 정산받을 미사용 연차 일수와 예상 수당도 함께 확인하세요."),
+        "simal": ("/calc/annual-leave/", "무료 연차 · 연차수당 계산기", "재직기간별 법정 연차 발생 일수를 간편하게 확인하세요."),
         "wiimjang": ("/calc/brokerage/", "무료 부동산 중개수수료(복비) 계산기", "부동산 대리 계약 시 매매·전세·월세 상한요율과 부가세를 바로 계산하세요."),
         "chayongjeung": ("/calc/brokerage/", "무료 부동산 중개수수료(복비) 계산기", "주택 매매·전세 자금 계획 시 예상 중개보수(복비)도 함께 확인하세요."),
+        "habuiseo": ("/calc/brokerage/", "무료 부동산 중개수수료(복비) 계산기", "임대차·매매 관련 중개보수 상한요율도 함께 확인해 보세요."),
     }
     related_calc_card = ""
     if tool["key"] in calc_link_map:

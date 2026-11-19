@@ -533,4 +533,10 @@ TOOLS = [
     },
 ]
 
+from content.pages_extra import EXTRA_TOOLS  # noqa: E402
+
+# Keep all 12 forms grouped cleanly before 'stamp'
+_STAMP_TOOL = [t for t in TOOLS if t["kind"] == "stamp"]
+_BASE_FORMS = [t for t in TOOLS if t["kind"] == "form"]
+TOOLS = _BASE_FORMS + EXTRA_TOOLS + _STAMP_TOOL
 TOOL_MAP = {t["key"]: t for t in TOOLS}

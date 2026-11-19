@@ -123,6 +123,11 @@ def run_audit():
         "/gyeonjeokseo/",
         "/geunro/",
         "/georae/",
+        "/gyeongryeok/",
+        "/yeongsujeung/",
+        "/jichul/",
+        "/simal/",
+        "/habuiseo/",
         "/stamp/",
         "/calc/vat/",
         "/calc/annual-leave/",
@@ -206,7 +211,9 @@ def run_audit():
 
         if route in (
             "/sajikseo/", "/chayongjeung/", "/wiimjang/", "/jaejik/",
-            "/gyeonjeokseo/", "/geunro/", "/georae/", "/stamp/",
+            "/gyeonjeokseo/", "/geunro/", "/georae/",
+            "/gyeongryeok/", "/yeongsujeung/", "/jichul/", "/simal/", "/habuiseo/",
+            "/stamp/",
             "/calc/vat/", "/calc/annual-leave/", "/calc/brokerage/",
         ):
             for req_type in ("WebApplication", "BreadcrumbList", "FAQPage"):

@@ -9,75 +9,80 @@ from content.guides_data import GUIDES
 from content.calculators_data import CALCULATORS
 
 TOOL_SHORT_DESCS = {
-    "sajikseo": "퇴직일·사직 사유 입력 후 도장 찍어 A4 PDF 저장",
-    "chayongjeung": "원금 한글·한자 자동 변환과 연 20% 이자율 확인",
-    "wiimjang": "민원·금융·부동산·차량 대리 위임 문구 원클릭 작성",
-    "jaejik": "재직기간 자동 계산과 주민번호 마스킹·회사 직인",
-    "gyeonjeokseo": "품목 추가·부가세(별도/포함/면세)·한글 총액 자동 계산",
-    "geunro": "2026 최저임금 자동 점검·정규직/계약직/알바 표준 양식",
-    "georae": "공급자(적색)·공급받는자(청색)·2매 동시 A4 출력",
-    "stamp": "원형·타원·사각직인·결재도장 투명 PNG 생성 및 바로 날인",
+    "sajikseo": "퇴사 의사 · 퇴직일 작성",
+    "chayongjeung": "금액 한글·한자 자동 변환",
+    "wiimjang": "민원 · 은행 · 부동산 대리",
+    "jaejik": "재직기간 계산 · 회사 직인",
+    "gyeonjeokseo": "품목 · 부가세 자동 계산",
+    "geunro": "2026 최저임금 자동 점검",
+    "georae": "적색 · 청색 2매 동시 출력",
+    "gyeongryeok": "이직 · 자격증 경력 증빙",
+    "yeongsujeung": "계약금 · 대금 수령 확인",
+    "jichul": "회사 경비 · 출장비 합계",
+    "simal": "업무 경위 · 재발방지 보고",
+    "habuiseo": "사고 · 분쟁 합의 양측 날인",
+    "stamp": "투명 PNG · 서식 바로 날인",
 }
 
 CALC_SHORT_DESCS = {
-    "vat": "공급가액 +10% 및 부가세 포함 역산·한글 금액 확인",
-    "annual-leave": "입사일·회계연도 기준 발생 연차와 미사용 연차수당 계산",
-    "brokerage": "2026 주택·오피스텔·상가 상한요율 및 월세 특례 계산",
+    "vat": "공급가액 +10% · 포함 역산",
+    "annual-leave": "입사일 · 회계연도 · 수당",
+    "brokerage": "주택 · 오피스텔 · 월세 복비",
 }
 
 
 def render_home_body(cfg):
-    cards_html = []
+    form_tiles = []
+    stamp_tool = None
     for t in TOOLS:
-        is_stamp = t["kind"] == "stamp"
-        extra_cls = " stamp-accent" if is_stamp else ""
-        card_title = "온라인 도장 만들기" if is_stamp else f"{t['short_name']} 양식"
+        if t["kind"] == "stamp":
+            stamp_tool = t
+            continue
         short_desc = TOOL_SHORT_DESCS.get(t["key"], t["card_desc"])
-        cta_label = "도장 만들기 →" if is_stamp else "바로 작성 →"
-        search_terms = f"{card_title} {t['short_name']} {short_desc} {t['keywords']}"
-        cards_html.append(
+        form_tiles.append(
             f"""
-            <a class="simple-card{extra_cls}" href="/{t['slug']}/" data-searchable-card data-search="{search_terms}">
-              <div>
-                <h3>{card_title}</h3>
-                <p>{short_desc}</p>
+            <a class="action-tile tile-form" href="/{t['slug']}/">
+              <div class="action-tile-top">
+                <h3>{t['short_name']}</h3>
+                <span class="tile-arrow" aria-hidden="true">→</span>
               </div>
-              <span class="card-cta">{cta_label}</span>
+              <p>{short_desc}</p>
             </a>
             """
         )
 
-    calc_cards_html = []
+    utility_tiles = []
+    if stamp_tool:
+        utility_tiles.append(
+            f"""
+            <a class="action-tile tile-stamp" href="/{stamp_tool['slug']}/">
+              <div class="action-tile-top">
+                <h3>온라인 도장 만들기</h3>
+                <span class="tile-arrow" aria-hidden="true">→</span>
+              </div>
+              <p>{TOOL_SHORT_DESCS['stamp']}</p>
+            </a>
+            """
+        )
     for c in CALCULATORS:
         short_desc = CALC_SHORT_DESCS.get(c["key"], c["card_desc"])
-        search_terms = f"{c['short_name']} {short_desc} {c['keywords']}"
-        calc_cards_html.append(
+        utility_tiles.append(
             f"""
-            <a class="simple-card" href="{c['path']}" data-searchable-card data-search="{search_terms}">
-              <div>
+            <a class="action-tile tile-calc" href="{c['path']}">
+              <div class="action-tile-top">
                 <h3>{c['short_name']}</h3>
-                <p>{short_desc}</p>
+                <span class="tile-arrow" aria-hidden="true">→</span>
               </div>
-              <span class="card-cta">계산하기 →</span>
+              <p>{short_desc}</p>
             </a>
             """
         )
 
-    guide_cards_html = "".join(
-        f"""
-        <a href="/guide/{g['slug']}/" class="guide-simple-card">
-          <h3>{g['title']}</h3>
-          <p>{g['summary']}</p>
-        </a>
-        """
-        for g in GUIDES
-    )
-
     home_faqs = [
-        ("바로서식은 정말 100% 무료인가요? 회원가입이 필요한가요?", "네, 바로서식에서 제공하는 7종 무료 서식 작성기, 온라인 투명 도장 생성기, 실무 계산기 3종은 회원가입, 로그인, 결제 없이 누구나 무제한 무료로 이용할 수 있습니다."),
+        ("바로서식은 정말 100% 무료인가요? 회원가입이 필요한가요?", "네, 바로서식에서 제공하는 12종 무료 서식 작성기, 온라인 투명 도장 생성기, 실무 계산기 3종은 회원가입, 로그인, 결제 없이 누구나 무제한 무료로 이용할 수 있습니다."),
         ("작성한 사직서나 차용증의 개인정보가 서버에 저장되나요?", "아니요. 바로서식은 별도의 백엔드 서버나 데이터베이스를 사용하지 않는 100% 브라우저 로컬 처리 웹사이트입니다. 입력하신 이름, 주소, 주민등록번호, 금액 등 모든 내용은 오직 사용자의 기기 화면에서만 처리되며 외부 서버로 절대 전송되지 않습니다."),
         ("한글(HWP)이나 워드, 엑셀 프로그램이 없어도 PDF로 저장할 수 있나요?", "네, 크롬·엣지·사파리·웨일 등 일반 웹 브라우저만 있으면 충분합니다. 작성 완료 후 'A4 인쇄 / PDF 저장' 버튼을 누르고 인쇄 창에서 대상을 'PDF로 저장'으로 선택하면 깨짐 없는 고화질 표준 A4 PDF 파일로 바로 저장됩니다."),
-        ("온라인 도장을 만들어서 서식에 바로 찍을 수 있나요?", "네! '도장 만들기' 페이지에서 투명 도장을 만들고 '내 도장함에 저장'을 누르면 7종 서식 어디서든 클릭 한 번으로 문서의 (인) 또는 (직인) 자리에 바로 날인할 수 있습니다. 각 서식 페이지 안에서도 이름을 입력해 3초 만에 즉시 도장을 찍을 수 있습니다."),
+        ("온라인 도장을 만들어서 서식에 바로 찍을 수 있나요?", "네! '온라인 도장 만들기' 페이지에서 투명 도장을 만들고 '내 도장함에 저장'을 누르면 12종 서식 어디서든 클릭 한 번으로 문서의 (인) 또는 (직인) 자리에 바로 날인할 수 있습니다."),
         ("모바일 스마트폰에서도 서식을 작성하고 PDF로 저장할 수 있나요?", "네, 모바일 화면에서는 '입력하기'와 'A4 미리보기' 탭 및 하단 고정 인쇄 바를 통해 간편하게 작성하고 모바일 브라우저 인쇄/PDF 저장 기능으로 문서를 저장할 수 있습니다."),
     ]
 
@@ -98,77 +103,56 @@ def render_home_body(cfg):
             <div class="home-hero-compact">
               <h1>가입 없이 바로 쓰는 무료 서식 · 도장 · 계산기</h1>
               <p class="hero-desc">빈칸만 채우면 A4 인쇄·PDF 저장까지 브라우저에서 1분 만에 끝납니다.</p>
-              <div class="hero-search-wrap">
-                <span class="hero-search-icon" aria-hidden="true">
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                  </svg>
-                </span>
-                <input
-                  type="search"
-                  id="homeQuickSearch"
-                  class="hero-search-input"
-                  placeholder="서식·도장·계산기 빠르게 찾기 (예: 사직서, 차용증, 부가세, 연차, 복비)"
-                  aria-label="서식, 도장, 계산기 빠른 검색"
-                  autocomplete="off"
-                >
-                <button type="button" id="homeSearchClear" class="hero-search-clear" aria-label="검색어 지우기">×</button>
-              </div>
             </div>
           </div>
         </section>
 
-        <div class="container">
-          <div id="homeSearchEmpty" class="search-empty-state">
-            <p style="margin:0 0 10px;">입력하신 검색어와 일치하는 서식이나 계산기가 없습니다.</p>
-            <button type="button" id="homeSearchResetBtn" class="btn btn-outline btn-sm">전체 도구 다시 보기</button>
-          </div>
-        </div>
-
-        <section class="home-section-compact" id="tools" data-searchable-section>
+        <section class="home-section-compact" id="tools">
           <div class="container">
             <div class="home-section-head">
-              <h2>무료 A4 서식 7종 · 도장 만들기</h2>
-              <span class="sub-note">서버 저장 없음 · 100% 브라우저 로컬 처리</span>
+              <h2><span class="dot-swatch blue" aria-hidden="true"></span>무료 A4 서식 12종</h2>
+              <span class="sub-note">서버 저장 없음 · 100% 브라우저 작성</span>
             </div>
             <div class="tools-grid">
-              {''.join(cards_html)}
+              {''.join(form_tiles)}
             </div>
           </div>
         </section>
 
-        <section class="home-section-compact calc-band" id="calculators" data-searchable-section>
+        <section class="home-section-compact second-band" id="calculators">
           <div class="container">
             <div class="home-section-head">
-              <h2>실무 계산기 3종</h2>
-              <span class="sub-note">2026년 최신 법령 기준 자동 계산</span>
+              <h2>
+                <span class="dot-swatch red" aria-hidden="true"></span>온라인 도장
+                <span style="color:var(--border-strong);margin:0 2px;">·</span>
+                <span class="dot-swatch green" aria-hidden="true"></span>실무 계산기 3종
+              </h2>
+              <span class="sub-note">투명 PNG 날인 · 2026 법령 기준</span>
             </div>
-            <div class="calc-home-grid">
-              {''.join(calc_cards_html)}
+            <div class="utility-row-grid">
+              {''.join(utility_tiles)}
             </div>
+          </div>
+        </section>
+
+        <section class="guide-banner-wrap">
+          <div class="container">
+            <a class="guide-banner-btn" href="/guide/">
+              <div class="guide-banner-text">
+                <strong>서류 작성 전 꼭 읽어야 할 실무 가이드 ({len(GUIDES)}편)</strong>
+                <span>퇴사·실업급여·가족 간 차용증·2026 최저임금·부가세·위임장·전자 도장 핵심 정리</span>
+              </div>
+              <span class="guide-banner-cta">실무 가이드 보기 →</span>
+            </a>
           </div>
         </section>
 
         <div class="container"><div class="ad-slot" data-ad-position="home-mid"></div></div>
 
-        <section class="section" style="padding:32px 0 38px;border-top:1px solid var(--border);background:#f8fafc;">
-          <div class="container">
-            <div class="home-section-head" style="margin-bottom:16px;">
-              <h2>서류 작성 전 꼭 읽어야 할 실무 가이드 ({len(GUIDES)}편)</h2>
-              <a href="/guide/" class="btn btn-outline btn-sm">가이드 목록 보기 →</a>
-            </div>
-            <div class="guide-simple-grid">
-              {guide_cards_html}
-            </div>
-          </div>
-        </section>
-
         <section class="editorial-section">
           <div class="container-narrow guide-article">
             <h2>{cfg['site_name']} 이용 안내 및 자주 묻는 질문</h2>
-            <p>{cfg['site_name']}은 대한민국 직장인, 소상공인, 프리랜서, 개인이 일상과 업무에서 가장 자주 찾는 표준 A4 공식 서식 7종(사직서, 차용증, 위임장, 재직증명서, 견적서, 표준근로계약서, 거래명세서), 한글 투명 도장 생성기, 그리고 실무 계산기 3종(부가세·연차·중개수수료)을 로그인 없이 무료로 제공하는 웹 도구 서비스입니다.</p>
-            <p>각 도구 페이지와 실무 가이드에는 <strong>2026년 최신 법령 기준(최저임금, 이자제한법, 근로기준법, 부가가치세법, 공인중개사법 등)에 맞춘 작성 요령과 체크리스트</strong>가 함께 정리되어 있어 처음 문서를 작성하시는 분도 실수 없이 완성도 높은 서류를 준비하실 수 있습니다.</p>
+            <p>{cfg['site_name']}은 대한민국 직장인, 소상공인, 프리랜서, 개인이 일상과 업무에서 가장 자주 찾는 표준 A4 공식 서식 12종(사직서, 차용증, 위임장, 재직증명서, 견적서, 표준근로계약서, 거래명세서, 경력증명서, 영수증, 지출결의서, 경위서·시말서, 합의서), 한글 투명 도장 생성기, 그리고 실무 계산기 3종(부가세·연차·중개수수료)을 로그인 없이 무료로 제공하는 웹 도구 서비스입니다.</p>
 
             <h3>자주 묻는 질문 (FAQ)</h3>
             <div class="faq-list">

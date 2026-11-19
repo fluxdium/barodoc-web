@@ -166,6 +166,7 @@ def build(cfg):
                 "/assets/js/forms-core.js",
                 "/assets/js/forms-personal.js",
                 "/assets/js/forms-business.js",
+                "/assets/js/forms-extra.js",
             ]
 
         ld_items = [
