@@ -25,6 +25,7 @@ if str(SRC_DIR) not in sys.path:
 
 from content.pages_data import TOOLS  # noqa: E402
 from content.guides_data import GUIDES  # noqa: E402
+from content.calculators_data import CALCULATORS  # noqa: E402
 from content.static_pages import (  # noqa: E402
     render_404_body,
     render_about_body,
@@ -35,6 +36,7 @@ from content.static_pages import (  # noqa: E402
 )
 from templates.layout import (  # noqa: E402
     build_base_html,
+    build_calculator_page_body,
     build_form_page_body,
     build_guide_article_body,
     build_guide_index_body,
@@ -188,7 +190,31 @@ def build(cfg):
         )
         sitemap_entries.append((path, "monthly", "0.9"))
 
-    # 2.5 Editorial Practical Guides (/guide/ + 6 deep articles for AdSense & SEO)
+    # 2.4 Free Calculators (3 High-Search-Volume Practical Calculators)
+    for calc in CALCULATORS:
+        cpath = calc["path"]
+        c_ld = [
+            make_webapp_ld(cfg, calc, cpath),
+            make_breadcrumb_ld(domain, calc["short_name"], cpath),
+            make_faq_ld(calc["faqs"]),
+        ]
+        write_text(
+            f"calc/{calc['slug']}/index.html",
+            build_base_html(
+                cfg,
+                path=cpath,
+                title=calc["title"],
+                description=calc["description"],
+                keywords=calc["keywords"],
+                active_slug="calc",
+                body_html=build_calculator_page_body(calc, CALCULATORS),
+                extra_scripts=["/assets/js/calculators.js"],
+                json_ld_items=c_ld,
+            ),
+        )
+        sitemap_entries.append((cpath, "monthly", "0.9"))
+
+    # 2.5 Editorial Practical Guides (/guide/ + 13 deep articles for AdSense & SEO)
     write_text(
         "guide/index.html",
         build_base_html(
@@ -241,6 +267,9 @@ def build(cfg):
                 {"@type": "ListItem", "position": 3, "name": guide["title"], "item": f"{domain}{gpath}"},
             ],
         }
+        guide_lds = [article_ld, crumb_ld]
+        if guide.get("faqs"):
+            guide_lds.append(make_faq_ld(guide["faqs"]))
         write_text(
             f"guide/{guide['slug']}/index.html",
             build_base_html(
@@ -251,7 +280,7 @@ def build(cfg):
                 keywords=guide["keywords"],
                 active_slug="guide",
                 body_html=build_guide_article_body(cfg, guide, GUIDES),
-                json_ld_items=[article_ld, crumb_ld],
+                json_ld_items=guide_lds,
             ),
         )
         sitemap_entries.append((gpath, "monthly", "0.8"))

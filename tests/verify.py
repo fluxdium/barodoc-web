@@ -124,6 +124,9 @@ def run_audit():
         "/geunro/",
         "/georae/",
         "/stamp/",
+        "/calc/vat/",
+        "/calc/annual-leave/",
+        "/calc/brokerage/",
         "/guide/",
         "/guide/resignation-checklist/",
         "/guide/iou-legal-validity/",
@@ -131,6 +134,13 @@ def run_audit():
         "/guide/vat-quotation-statement/",
         "/guide/poa-documents/",
         "/guide/electronic-stamp-guide/",
+        "/guide/family-loan-gift-tax/",
+        "/guide/resignation-notice-period/",
+        "/guide/parttime-contract-checklist/",
+        "/guide/poa-seal-certificate/",
+        "/guide/simplified-taxpayer-quotation/",
+        "/guide/certificate-employment-vs-career/",
+        "/guide/severance-pay-annual-leave/",
         "/about/",
         "/privacy/",
         "/terms/",
@@ -194,7 +204,11 @@ def run_audit():
             except Exception as exc:
                 errors.append(f"[{route}] Invalid JSON-LD #{idx + 1}: {exc}")
 
-        if route in ("/sajikseo/", "/chayongjeung/", "/wiimjang/", "/jaejik/", "/gyeonjeokseo/", "/geunro/", "/georae/", "/stamp/"):
+        if route in (
+            "/sajikseo/", "/chayongjeung/", "/wiimjang/", "/jaejik/",
+            "/gyeonjeokseo/", "/geunro/", "/georae/", "/stamp/",
+            "/calc/vat/", "/calc/annual-leave/", "/calc/brokerage/",
+        ):
             for req_type in ("WebApplication", "BreadcrumbList", "FAQPage"):
                 if req_type not in ld_types:
                     errors.append(f"[{route}] Missing JSON-LD {req_type}")

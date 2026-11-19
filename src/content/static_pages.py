@@ -6,6 +6,7 @@
 
 from content.pages_data import TOOLS
 from content.guides_data import GUIDES
+from content.calculators_data import CALCULATORS
 
 
 def render_home_body(cfg):
@@ -111,6 +112,32 @@ def render_home_body(cfg):
           </div>
         </section>
 
+        <section class="section" id="calculators" style="padding-top:4px;">
+          <div class="container">
+            <div class="section-header">
+              <h2>서식과 함께 쓰는 무료 실무 계산기 3종</h2>
+              <p>견적서·사직서·근로계약서·부동산 계약 전에 꼭 필요한 부가세·연차·중개수수료를 1초 만에 계산하세요.</p>
+            </div>
+            <div class="features-3col">
+              {''.join(
+                  f'''
+                  <a class="tool-card" href="{c['path']}">
+                    <div class="tool-card-top">
+                      <div class="tool-icon" aria-hidden="true">{c['icon']}</div>
+                      <span class="tool-tag">{c['tag']}</span>
+                    </div>
+                    <h3>{c['short_name']}</h3>
+                    <p>{c['card_desc']}</p>
+                    <ul class="tool-card-features">{''.join(f'<li>✓ {f}</li>' for f in c['card_features'])}</ul>
+                    <span class="tool-card-cta">{c['short_name']} 열기 →</span>
+                  </a>
+                  '''
+                  for c in CALCULATORS
+              )}
+            </div>
+          </div>
+        </section>
+
         <div class="container"><div class="ad-slot" data-ad-position="home-mid"></div></div>
 
         <section class="section" style="padding-top:12px;">
@@ -140,10 +167,10 @@ def render_home_body(cfg):
           <div class="container">
             <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;">
               <div>
-                <h2>서류 작성 전 꼭 읽어야 할 실무 가이드</h2>
-                <p>2026년 최신 법령 기준으로 퇴사·금전거래·근로계약·부가세·위임장·전자도장 핵심 규정을 알기 쉽게 정리했습니다.</p>
+                <h2>서류 작성 전 꼭 읽어야 할 실무 가이드 ({len(GUIDES)}편)</h2>
+                <p>2026년 최신 법령 기준으로 퇴사·차용증·근로계약·부가세·위임장·전자도장 핵심 규정을 알기 쉽게 정리했습니다.</p>
               </div>
-              <a href="/guide/" class="btn btn-outline btn-sm">전체 가이드 보기 →</a>
+              <a href="/guide/" class="btn btn-outline btn-sm">전체 {len(GUIDES)}편 보기 →</a>
             </div>
             <div class="features-3col">
               {''.join(
@@ -158,7 +185,7 @@ def render_home_body(cfg):
                     <span class="tool-card-cta">가이드 읽기 →</span>
                   </a>
                   '''
-                  for g in GUIDES
+                  for g in GUIDES[:6]
               )}
             </div>
           </div>

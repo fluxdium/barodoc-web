@@ -353,3 +353,8 @@ GUIDES = [
 """,
     },
 ]
+
+from content.guides_extra import EXTRA_GUIDES  # noqa: E402
+
+GUIDES = GUIDES + EXTRA_GUIDES
+

@@ -5,6 +5,7 @@
 
 import json
 from content.pages_data import TOOLS
+from content.calculators_data import CALCULATORS
 
 
 def json_ld_tag(obj):
@@ -67,13 +68,20 @@ def build_base_html(
                 f'<a class="mobile-drawer-link{is_active}" href="/{t["slug"]}/">{t["short_name"]} 양식</a>'
             )
 
+    calc_active = " active" if active_slug == "calc" else ""
     guide_active = " active" if active_slug == "guide" else ""
+    nav_links.append(f'<a class="nav-link{calc_active}" href="/#calculators">계산기</a>')
     nav_links.append(f'<a class="nav-link{guide_active}" href="/guide/">실무 가이드</a>')
+    for c in CALCULATORS:
+        mobile_links.append(f'<a class="mobile-drawer-link" href="{c["path"]}">{c["short_name"]}</a>')
     mobile_links.append(f'<a class="mobile-drawer-link{guide_active}" href="/guide/">실무 가이드</a>')
 
     footer_tool_links = "".join(
         f'<li><a href="/{t["slug"]}/">{t["short_name"] if t["kind"] == "stamp" else t["short_name"] + " 양식"}</a></li>'
         for t in TOOLS
+    ) + "".join(
+        f'<li><a href="{c["path"]}">{c["short_name"]}</a></li>'
+        for c in CALCULATORS
     )
 
     ld_html = "\n  ".join(json_ld_tag(item) for item in (json_ld_items or []))
@@ -230,6 +238,26 @@ def build_editorial_section(tool):
         """
     )
 
+    calc_link_map = {
+        "gyeonjeokseo": ("/calc/vat/", "무료 부가세(VAT) 계산기", "공급가액 +10% 계산과 부가세 포함 역산을 1초 만에 확인해 보세요."),
+        "georae": ("/calc/vat/", "무료 부가세(VAT) 계산기", "거래명세서 작성 전 공급가액과 부가세(10%)를 간편하게 계산하세요."),
+        "sajikseo": ("/calc/annual-leave/", "무료 연차 · 연차수당 계산기", "퇴사 전 남은 연차 일수와 미사용 연차수당 예상액을 미리 확인하세요."),
+        "geunro": ("/calc/annual-leave/", "무료 연차 · 연차수당 계산기", "입사일·회계연도 기준 법정 연차 발생 일수를 자동으로 계산합니다."),
+        "jaejik": ("/calc/annual-leave/", "무료 연차 · 연차수당 계산기", "입사일 기준 근속연차와 미사용 연차수당을 간편하게 확인하세요."),
+        "wiimjang": ("/calc/brokerage/", "무료 부동산 중개수수료(복비) 계산기", "부동산 대리 계약 시 매매·전세·월세 상한요율과 부가세를 바로 계산하세요."),
+        "chayongjeung": ("/calc/brokerage/", "무료 부동산 중개수수료(복비) 계산기", "주택 매매·전세 자금 계획 시 예상 중개보수(복비)도 함께 확인하세요."),
+    }
+    related_calc_card = ""
+    if tool["key"] in calc_link_map:
+        c_href, c_title, c_desc = calc_link_map[tool["key"]]
+        related_calc_card = f"""
+        <div class="aside-card" style="background:var(--brand-blue-soft);border-color:#bfdbfe;">
+          <h3>함께 쓰면 좋은 계산기</h3>
+          <p style="margin:0 0 10px;font-size:13.5px;color:var(--text-secondary);">{c_desc}</p>
+          <a href="{c_href}" class="btn btn-primary btn-block btn-sm">{c_title} →</a>
+        </div>
+        """
+
     return f"""
     <div class="container"><div class="ad-slot" data-ad-position="tool-below"></div></div>
     <section class="editorial-section">
@@ -243,7 +271,8 @@ def build_editorial_section(tool):
           </div>
         </article>
 
-        <aside class="editorial-aside" aria-label="관련 무료 서식">
+        <aside class="editorial-aside" aria-label="관련 무료 서식 및 계산기">
+          {related_calc_card}
           {stamp_aside}
           <div class="aside-card">
             <h3>다른 무료 서식 바로가기</h3>
@@ -572,6 +601,29 @@ def build_guide_article_body(cfg, guide, all_guides):
         for g in all_guides
         if g["slug"] != guide["slug"]
     )
+    faqs_block = ""
+    if guide.get("faqs"):
+        faq_items = "".join(
+            f"""
+            <details class="faq-item">
+              <summary>{q}</summary>
+              <div class="faq-answer">{a}</div>
+            </details>
+            """
+            for q, a in guide["faqs"]
+        )
+        faqs_block = f"""
+        <h3>자주 묻는 질문 (FAQ)</h3>
+        <div class="faq-list">
+          {faq_items}
+        </div>
+        """
+
+    sec_btn = ""
+    if guide.get("secondary_link"):
+        s_href, s_label = guide["secondary_link"]
+        sec_btn = f' <a href="{s_href}" class="btn btn-outline btn-sm">{s_label} →</a>'
+
     return f"""
     <section class="page-hero">
       <div class="container">
@@ -591,11 +643,14 @@ def build_guide_article_body(cfg, guide, all_guides):
       <div class="container editorial-grid">
         <article class="guide-article">
           {guide['body_html']}
+          {faqs_block}
 
           <div class="guide-callout" style="margin-top:28px;">
-            <strong>지금 바로 무료 A4 서식으로 작성해 보세요</strong>
+            <strong>지금 바로 무료 A4 서식·도구를 이용해 보세요</strong>
             <p style="margin:6px 0 12px;">회원가입 없이 브라우저에서 빈칸만 채우고 도장을 찍어 깨끗한 A4 PDF로 저장할 수 있습니다.</p>
-            <a href="/{guide['related_tool']}/" class="btn btn-primary btn-sm">{guide['related_tool_name']} 바로가기 →</a>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <a href="/{guide['related_tool']}/" class="btn btn-primary btn-sm">{guide['related_tool_name']} 바로가기 →</a>{sec_btn}
+            </div>
           </div>
         </article>
 
@@ -609,6 +664,84 @@ def build_guide_article_body(cfg, guide, all_guides):
             <h3>다른 실무 가이드</h3>
             <ul class="aside-links">
               {other_links}
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+    """
+
+
+def build_calculator_page_body(calc, all_calcs):
+    faqs_html = "".join(
+        f"""
+        <details class="faq-item">
+          <summary>{q}</summary>
+          <div class="faq-answer">{a}</div>
+        </details>
+        """
+        for q, a in calc["faqs"]
+    )
+    other_calcs = "".join(
+        f'<li><a href="{c["path"]}"><span>{c["short_name"]}</span><span>→</span></a></li>'
+        for c in all_calcs
+        if c["key"] != calc["key"]
+    )
+    form_links = "".join(
+        f'<li><a href="{href}"><span>{label.replace(" →", "")}</span><span>→</span></a></li>'
+        for href, label in calc["related_forms"]
+    )
+    return f"""
+    <section class="page-hero">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="현재 위치">
+          <a href="/">홈</a>
+          <span>›</span>
+          <a href="/#calculators">무료 계산기</a>
+          <span>›</span>
+          <span aria-current="page">{calc['short_name']}</span>
+        </nav>
+        <div class="page-hero-row">
+          <div>
+            <h1>{calc['h1']}</h1>
+            <p class="page-subtitle">{calc['subtitle']}</p>
+          </div>
+          <div class="privacy-pill">🔒 서버 저장 없음 · 100% 브라우저 즉시 계산</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="workbench-section">
+      <div class="container">
+        {calc['app_html']}
+      </div>
+    </section>
+
+    <div class="container"><div class="ad-slot" data-ad-position="calc-below"></div></div>
+
+    <section class="editorial-section">
+      <div class="container editorial-grid">
+        <article class="guide-article">
+          {calc['guide_html']}
+
+          <h3>자주 묻는 질문 (FAQ)</h3>
+          <div class="faq-list">
+            {faqs_html}
+          </div>
+        </article>
+
+        <aside class="editorial-aside" aria-label="연계 서식 및 계산기">
+          <div class="aside-card aside-stamp-cta">
+            <h3>연계 무료 A4 서식</h3>
+            <p>계산한 금액과 기준을 바탕으로 서식을 바로 작성하고 A4 PDF로 저장하세요.</p>
+            <ul class="aside-links">
+              {form_links}
+            </ul>
+          </div>
+          <div class="aside-card">
+            <h3>다른 무료 실무 계산기</h3>
+            <ul class="aside-links">
+              {other_calcs}
             </ul>
           </div>
         </aside>
