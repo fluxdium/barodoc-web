@@ -1572,13 +1572,13 @@ textarea {
   border-left-color: var(--warn);
 }
 
-.guide-callout strong {
+.guide-callout > strong:first-child {
   display: block;
   margin-bottom: 4px;
   color: var(--brand-navy);
 }
 
-.guide-callout.warn strong {
+.guide-callout.warn > strong:first-child {
   color: #92400e;
 }
 
