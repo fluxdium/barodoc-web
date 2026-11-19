@@ -306,6 +306,7 @@ def build_form_page_body(tool):
               <button type="button" class="btn btn-primary btn-lg btn-block" data-print-trigger>
                 A4 인쇄 / PDF로 저장하기
               </button>
+              <p class="editor-pdf-hint">인쇄 창에서 대상을 <strong>'PDF로 저장'</strong>으로 선택하고 <strong>'배경 그래픽'</strong>을 켜세요.</p>
             </div>
           </div>
 
@@ -323,12 +324,24 @@ def build_form_page_body(tool):
               </div>
             </div>
 
+            <div class="pdf-save-hint">
+              <span>PDF 저장 팁: 인쇄 창에서 대상을 <strong>'PDF로 저장'</strong>으로 선택하고 <strong>'배경 그래픽'</strong> 옵션을 켜면 도장과 표가 선명하게 저장됩니다.</span>
+            </div>
+
             <div class="preview-stage" id="previewStage">
               <div class="a4-scale-container" id="a4ScaleContainer">
                 <div id="a4PreviewTarget"></div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="mobile-floating-bar no-print" id="mobileFloatingBar">
+        <div class="mobile-floating-hint">인쇄 창에서 대상을 <strong>'PDF로 저장'</strong>으로 선택하세요</div>
+        <div class="mobile-floating-actions">
+          <button type="button" class="btn btn-outline btn-sm" id="mobileFloatingTabToggle">미리보기</button>
+          <button type="button" class="btn btn-primary btn-sm" data-print-trigger>A4 인쇄 / PDF 저장</button>
         </div>
       </div>
     </section>

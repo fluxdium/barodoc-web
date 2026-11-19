@@ -256,10 +256,10 @@ def render_privacy_body(cfg):
           </ul>
 
           <h2>4. 개인정보 보호 문의처</h2>
-          <p>본 사이트의 개인정보 처리와 관련한 문의, 불만 처리, 피해 구제 등은 아래 이메일로 연락해 주시면 신속히 답변드리겠습니다.</p>
+          <p>본 사이트의 개인정보 처리와 관련한 문의, 불만 처리, 피해 구제 등은 아래 온라인 문의 폼을 통해 접수해 주시면 영업일 기준 1~3일 이내에 신속히 확인 후 안내드리겠습니다.</p>
           <ul>
             <li><strong>운영자 / 서비스명:</strong> {cfg['site_name']} 운영팀</li>
-            <li><strong>문의 이메일:</strong> <a href="mailto:{cfg['contact_email']}" style="color:var(--brand-blue);">{cfg['contact_email']}</a></li>
+            <li><strong>접수 경로:</strong> <a href="/contact/" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">문의하기 페이지의 온라인 문의 폼</a></li>
           </ul>
 
           <h2>5. 개인정보처리방침의 변경</h2>
@@ -303,29 +303,58 @@ def render_terms_body(cfg):
 
 
 def render_contact_body(cfg):
+    access_key = cfg.get("web3forms_access_key", "여기에_Web3Forms_키_입력")
     return f"""
     <section class="static-page">
       <div class="container-narrow">
         <article class="static-card">
           <h1>문의하기</h1>
-          <div class="static-meta">{cfg['site_name']} 오류 제보 · 신규 서식 요청 · 제휴 및 광고 문의</div>
+          <div class="static-meta">{cfg['site_name']} 오류 제보 · 신규 서식 요청 · 법령 정정 · 제휴 문의</div>
 
-          <p>{cfg['site_name']}를 이용해 주셔서 감사합니다. 서비스 이용 중 발생하는 인쇄·PDF 오류 제보, 법령 개정에 따른 서식 및 가이드 업데이트 제안, 새로 추가되었으면 하는 무료 서식 아이디어가 있으시면 아래 공식 이메일로 편하게 연락해 주세요.</p>
+          <p>{cfg['site_name']}를 이용해 주셔서 감사합니다. 서비스 이용 중 발생하는 인쇄·PDF 오류 제보, 법령 개정에 따른 서식 및 가이드 업데이트 제안, 새로 추가되었으면 하는 무료 서식 아이디어가 있으시면 아래 온라인 문의 폼으로 편하게 남겨 주세요.</p>
 
-          <div class="guide-callout" style="margin:24px 0;">
-            <strong>공식 문의 이메일</strong>
-            <p style="margin:6px 0 4px;font-size:16px;">
-              <a href="mailto:{cfg['contact_email']}" style="color:var(--brand-blue);font-weight:800;text-decoration:underline;">{cfg['contact_email']}</a>
-            </p>
-            <p style="margin:0;font-size:13px;color:var(--text-secondary);">운영시간: 평일 09:00 ~ 18:00 (주말·공휴일 제외) · 평균 회신 기간: 영업일 기준 1~3일 이내</p>
+          <div class="contact-form-card">
+            <h2>온라인 문의 폼</h2>
+            <p class="contact-form-sub">운영시간: 평일 09:00 ~ 18:00 (주말·공휴일 제외) · 평균 회신 기간: 영업일 기준 1~3일 이내</p>
+
+            <form id="contactForm" class="contact-form" action="https://api.web3forms.com/submit" method="POST">
+              <input type="hidden" name="access_key" value="{access_key}">
+              <input type="hidden" name="subject" id="formSubject" value="[바로문서 문의] 오류 제보">
+              <input type="hidden" name="from_name" value="{cfg['site_name']} 웹사이트">
+              <input type="checkbox" name="botcheck" style="display:none;" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+              <div class="field">
+                <label for="inquiryType">문의 유형 <span style="color:var(--seal-red);">*</span></label>
+                <select id="inquiryType" name="문의_유형" required>
+                  <option value="오류 제보" selected>오류 제보</option>
+                  <option value="신규 서식 요청">신규 서식 요청</option>
+                  <option value="법령·내용 정정">법령·내용 정정</option>
+                  <option value="제휴 및 기타">제휴 및 기타</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="replyEmail">회신받을 이메일 <span style="font-weight:500;color:var(--text-muted);">(선택)</span></label>
+                <input type="email" id="replyEmail" name="email" placeholder="답변을 받으실 경우에만 이메일 주소를 입력해 주세요" autocomplete="email">
+                <p class="field-help">회신이 필요 없는 단순 제보나 건의는 비워 두셔도 접수됩니다.</p>
+              </div>
+
+              <div class="field">
+                <label for="inquiryMessage">문의 내용 <span style="color:var(--seal-red);">*</span></label>
+                <textarea id="inquiryMessage" name="message" required placeholder="오류 제보 시 사용 중인 기기/브라우저(예: 크롬, 아이폰 사파리)와 문제가 발생한 서식 이름을 함께 적어주시면 더욱 빠르게 개선할 수 있습니다."></textarea>
+              </div>
+
+              <button type="submit" id="contactSubmitBtn" class="btn btn-primary btn-lg btn-block">문의 보내기</button>
+              <div id="contactStatus" class="contact-status" role="status" aria-live="polite" hidden></div>
+            </form>
           </div>
 
           <h2>자주 접수되는 문의 유형 및 빠른 처리 안내</h2>
           <ul>
             <li><strong>오류 제보:</strong> 특정 브라우저(크롬·엣지·사파리·웨일 등)나 모바일 기기에서 A4 인쇄 여백이 어긋나거나 계산·도장 날인 오류가 발생하는 경우, 사용 중인 <em>기기/브라우저 이름과 문제가 발생한 서식 페이지 주소</em>를 함께 보내주시면 가장 빠르게 수정합니다.</li>
             <li><strong>신규 무료 서식 요청:</strong> 경력증명서, 영수증, 내용증명, 퇴직금 정산서, 발주서 등 실무에서 자주 쓰이는 무료 A4 서식 아이디어를 제안해 주시면 우선순위를 검토해 반영합니다.</li>
-            <li><strong>법령·콘텐츠 정정 요청:</strong> 실무 가이드나 FAQ 내용 중 법령 개정·수치 변동이 필요한 부분을 알려주시면 확인 즉시 최신화합니다.</li>
-            <li><strong>비즈니스·제휴·광고 문의:</strong> 기업용 맞춤 서식 연동 및 광고 제휴 관련 문의를 환영합니다.</li>
+            <li><strong>법령·내용 정정:</strong> 실무 가이드나 FAQ 내용 중 법령 개정·수치 변동이 필요한 부분을 알려주시면 확인 즉시 최신화합니다.</li>
+            <li><strong>제휴 및 기타:</strong> 기업용 맞춤 서식 연동 및 비즈니스·광고 제휴 관련 문의를 환영합니다.</li>
           </ul>
 
           <h2>개별 법률·노무·세무 상담 안내 (공공 무료 상담 기관)</h2>

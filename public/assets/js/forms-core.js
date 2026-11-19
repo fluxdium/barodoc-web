@@ -148,20 +148,40 @@
       });
     });
 
-    // Mobile Tabs (입력하기 / A4 미리보기)
+    // Mobile Tabs (입력하기 / A4 미리보기) + Floating Bar Sync
     const grid = document.getElementById('workbenchGrid');
+    const floatingBar = document.getElementById('mobileFloatingBar');
+    const floatingToggleBtn = document.getElementById('mobileFloatingTabToggle');
+    if (floatingBar) {
+      document.body.classList.add('has-floating-bar');
+    }
+
+    function setMobileTab(target) {
+      if (grid) grid.setAttribute('data-mobile-tab', target);
+      document.querySelectorAll('[data-mobile-tab-btn]').forEach((b) => {
+        b.classList.toggle('active', b.getAttribute('data-mobile-tab-btn') === target);
+      });
+      if (floatingToggleBtn) {
+        floatingToggleBtn.textContent = target === 'preview' ? '내용 수정' : '미리보기';
+      }
+      if (target === 'preview') {
+        requestAnimationFrame(rescaleA4);
+      }
+    }
+
     document.querySelectorAll('[data-mobile-tab-btn]').forEach((btn) => {
       btn.addEventListener('click', () => {
-        const target = btn.getAttribute('data-mobile-tab-btn');
-        if (grid) grid.setAttribute('data-mobile-tab', target);
-        document.querySelectorAll('[data-mobile-tab-btn]').forEach((b) => {
-          b.classList.toggle('active', b.getAttribute('data-mobile-tab-btn') === target);
-        });
-        if (target === 'preview') {
-          requestAnimationFrame(rescaleA4);
-        }
+        setMobileTab(btn.getAttribute('data-mobile-tab-btn'));
       });
     });
+
+    if (floatingToggleBtn) {
+      floatingToggleBtn.addEventListener('click', () => {
+        const cur = grid ? grid.getAttribute('data-mobile-tab') : 'edit';
+        setMobileTab(cur === 'preview' ? 'edit' : 'preview');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
 
     renderEditor();
     renderPreview();

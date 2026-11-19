@@ -123,7 +123,12 @@ def build(cfg):
             "name": cfg["site_name"],
             "url": f"{domain}/",
             "logo": f"{domain}/assets/img/favicon.svg",
-            "email": cfg["contact_email"],
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer support",
+                "url": f"{domain}/contact/",
+                "availableLanguage": "Korean",
+            },
         },
         make_faq_ld(home_faqs),
     ]
@@ -292,6 +297,7 @@ def build(cfg):
             },
             make_breadcrumb_ld(domain, title.split("|")[0].strip(), path),
         ]
+        extra_scripts = ["/assets/js/contact.js"] if slug == "contact" else None
         write_text(
             f"{slug}/index.html",
             build_base_html(
@@ -301,6 +307,7 @@ def build(cfg):
                 description=desc,
                 active_slug=slug,
                 body_html=body,
+                extra_scripts=extra_scripts,
                 json_ld_items=ld_items,
             ),
         )
@@ -374,9 +381,9 @@ def build(cfg):
 
 def main():
     parser = argparse.ArgumentParser(description="Build BaroDoc static site")
-    parser.add_argument("--domain", help="Override site domain (e.g. https://barodoc.kr)")
+    parser.add_argument("--domain", help="Override site domain (e.g. https://barodoc.pe.kr)")
     parser.add_argument("--adsense", help="Override AdSense client ID (e.g. ca-pub-1234567890123456)")
-    parser.add_argument("--email", help="Override contact email")
+    parser.add_argument("--web3forms-key", help="Override Web3Forms access key")
     parser.add_argument("--google-verify", help="Google Search Console verification token")
     parser.add_argument("--naver-verify", help="Naver Search Advisor verification token")
     parser.add_argument("--save-config", action="store_true", help="Save CLI overrides back to site-config.json")
@@ -387,8 +394,8 @@ def main():
         cfg["domain"] = args.domain.rstrip("/")
     if args.adsense is not None:
         cfg["adsense_client_id"] = args.adsense.strip()
-    if args.email:
-        cfg["contact_email"] = args.email.strip()
+    if args.web3forms_key is not None:
+        cfg["web3forms_access_key"] = args.web3forms_key.strip()
     if args.google_verify is not None:
         cfg["google_site_verification"] = args.google_verify.strip()
     if args.naver_verify is not None:

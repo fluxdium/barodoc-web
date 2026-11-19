@@ -245,6 +245,23 @@ def run_audit():
     if not (PUBLIC / "_headers").exists():
         errors.append("Missing public/_headers")
 
+    # Strict Zero-Email & mailto: audit across ALL generated HTML files
+    email_pattern = re.compile(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}")
+    for html_file in PUBLIC.rglob("*.html"):
+        raw = html_file.read_text(encoding="utf-8")
+        if "mailto:" in raw.lower():
+            errors.append(f"[{html_file.relative_to(PUBLIC)}] Found forbidden 'mailto:' link")
+        # Ignore CDN package version strings like pretendard@v1.3.9 (no domain TLD)
+        found_emails = [m.group(0) for m in email_pattern.finditer(raw) if not m.group(0).startswith("pretendard@")]
+        if found_emails:
+            errors.append(f"[{html_file.relative_to(PUBLIC)}] Found exposed email address(es): {found_emails}")
+
+    # Verify Web3Forms contact form essentials
+    contact_html = (PUBLIC / "contact" / "index.html").read_text(encoding="utf-8")
+    for required_token in ("https://api.web3forms.com/submit", 'name="access_key"', 'name="botcheck"', "[바로문서 문의]"):
+        if required_token not in contact_html:
+            errors.append(f"[/contact/] Missing Web3Forms token: {required_token}")
+
     print("=" * 92)
     print(f"{'Route':<18} {'Title':>5} {'Desc':>5} {'Chars(no ws)':>12} {'FAQs':>5}  JSON-LD Schemas")
     print("-" * 92)
