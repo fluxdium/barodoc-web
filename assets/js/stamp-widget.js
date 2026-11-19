@@ -104,10 +104,11 @@
         `;
       }
 
-      const suggestedName =
+      const rawSuggested =
         (typeof options.getSuggestedName === 'function' && options.getSuggestedName(state.activeSlot)) ||
         activeDef.defaultName ||
         '홍길동';
+      const suggestedName = String(rawSuggested).replace(/\s+/g, '').slice(0, 9);
 
       container.innerHTML = `
         <div class="stamp-widget">
@@ -231,15 +232,16 @@
       }
     }
 
-    function renderStampHtml(slotKey, placeholderText) {
+    function renderStampHtml(slotKey, placeholderText, extraClass) {
       const stamp = state.stampsBySlot[slotKey];
       const label = placeholderText !== undefined ? placeholderText : '(인)';
+      const cls = extraClass ? `stamp-anchor ${extraClass}` : 'stamp-anchor';
       if (!stamp || !stamp.dataUrl) {
-        return `<span class="stamp-anchor"><span class="in-label">${U.escapeHtml(label)}</span></span>`;
+        return `<span class="${cls}"><span class="in-label">${U.escapeHtml(label)}</span></span>`;
       }
       const mm = stamp.sizeMm || state.defaultSizeMm;
       return `
-        <span class="stamp-anchor">
+        <span class="${cls}">
           <span class="in-label">${U.escapeHtml(label)}</span>
           <img class="stamp-overlay" src="${stamp.dataUrl}" alt="${U.escapeHtml(stamp.name)} 도장" style="width:${mm}mm;height:${mm}mm;">
         </span>

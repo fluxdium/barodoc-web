@@ -187,10 +187,20 @@
   vertical-align: middle;
 }
 
+.stamp-anchor.sm {
+  min-width: 9mm;
+  height: 9mm;
+}
+
 .stamp-anchor .in-label {
   color: #444444;
   font-size: 9.5pt;
   letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.stamp-anchor.sm .in-label {
+  font-size: 8.2pt;
 }
 
 .stamp-overlay {
@@ -376,16 +386,65 @@
 
 .doc-notes-box {
   border: 1px solid #333333;
-  padding: 3mm 3.5mm;
-  font-size: 9pt;
-  min-height: 18mm;
-  white-space: pre-wrap;
-  line-height: 1.55;
+  padding: 2.8mm 3.5mm;
+  font-size: 8.8pt;
+  min-height: 16mm;
+  line-height: 1.5;
 }
 
 .doc-notes-box strong {
   display: block;
-  margin-bottom: 1.5mm;
+  margin-bottom: 1.2mm;
+}
+
+.doc-notes-body {
+  white-space: pre-wrap;
+  word-break: keep-all;
+  margin: 0;
+}
+
+.ceo-stamp-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1mm;
+}
+
+/* Dense mode when quotation/statement has 8~12 line items so A4 never clips */
+.a4-sheet.dense-items {
+  padding: 10mm 13mm 10mm !important;
+}
+
+.a4-sheet.dense-items .doc-title.compact {
+  font-size: 17.5pt;
+  margin-bottom: 3.5mm;
+}
+
+.a4-sheet.dense-items .biz-header {
+  margin-bottom: 3mm;
+}
+
+.a4-sheet.dense-items .biz-total-banner {
+  padding: 2mm 3.5mm;
+  margin-bottom: 3mm;
+}
+
+.a4-sheet.dense-items .doc-table {
+  margin-bottom: 3mm;
+}
+
+.a4-sheet.dense-items .doc-table.compact th,
+.a4-sheet.dense-items .doc-table.compact td {
+  padding: 1.15mm 2mm;
+  font-size: 8.2pt;
+  line-height: 1.3;
+}
+
+.a4-sheet.dense-items .doc-notes-box {
+  padding: 2mm 3mm;
+  font-size: 8.2pt;
+  min-height: 12mm;
+  line-height: 1.4;
 }
 
 /* Standard Employment Contract compact styling to fit cleanly on 1 A4 page */

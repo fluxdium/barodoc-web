@@ -258,8 +258,8 @@
      ======================================================================== */
   F.register('chayongjeung', {
     stampSlots: [
-      { key: 'debtor', label: '채무자 (빌리는 분)', defaultName: '김채무', defaultShape: 'circle', sizeMm: 17 },
-      { key: 'creditor', label: '채권자 (빌려주는 분)', defaultName: '이채권', defaultShape: 'circle', sizeMm: 17 },
+      { key: 'debtor', label: '채무자', defaultName: '김채무', defaultShape: 'circle', sizeMm: 17 },
+      { key: 'creditor', label: '채권자', defaultName: '이채권', defaultShape: 'circle', sizeMm: 17 },
       { key: 'guarantor', label: '연대보증인', defaultName: '박보증', defaultShape: 'circle', sizeMm: 16 },
     ],
     getSuggestedStampName: (s, slot) => {
@@ -861,7 +861,11 @@
   F.register('jaejik', {
     stampSlots: [{ key: 'company', label: '회사 직인 / 대표이사 인', defaultName: '바로상사대표이사인', defaultShape: 'square', sizeMm: 21 }],
     defaultStampMm: 21,
-    getSuggestedStampName: (s) => (s.companyName ? s.companyName.replace(/\s+/g, '') + '인' : '바로상사대표이사인'),
+    getSuggestedStampName: (s) => {
+      if (!s.companyName) return '바로상사대표인';
+      const core = s.companyName.replace(/주식회사|\(주\)|유한회사|\s+/g, '');
+      return (core.slice(0, 8) || '바로상사') + '인';
+    },
     getInitialData: () => ({
       docNo: '제 2026-001 호',
       name: '',
