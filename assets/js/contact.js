@@ -65,9 +65,9 @@
 
       try {
         const formData = new FormData(form);
-        // Optional reply email: remove empty email field so Web3Forms doesn't reject blank email format
+        // Optional reply email: remove empty field so Web3Forms doesn't display blank line
         if (emailInput && !emailInput.value.trim()) {
-          formData.delete('email');
+          formData.delete('reply_email');
         }
 
         const res = await fetch('https://api.web3forms.com/submit', {
