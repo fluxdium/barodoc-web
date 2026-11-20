@@ -663,14 +663,14 @@
         return `
           <span class="${cls}">
             <span class="in-label">${U.escapeHtml(label)}</span>
-            <img class="stamp-overlay sig-overlay" src="${mark.dataUrl}" alt="${U.escapeHtml(mark.name)} 서명" style="height:${hMm}mm;width:auto;max-width:${maxWMm}mm;">
+            <img class="stamp-overlay sig-overlay" src="${mark.dataUrl}" alt="${U.escapeHtml(mark.name)} 서명" style="height:${hMm}mm;width:auto;max-width:${maxWMm}mm;max-height:none;">
           </span>
         `;
       }
       return `
         <span class="${cls}">
           <span class="in-label">${U.escapeHtml(label)}</span>
-          <img class="stamp-overlay" src="${mark.dataUrl}" alt="${U.escapeHtml(mark.name)} 도장" style="width:${mm}mm;height:${mm}mm;">
+          <img class="stamp-overlay" src="${mark.dataUrl}" alt="${U.escapeHtml(mark.name)} 도장" style="width:${mm}mm;height:${mm}mm;max-width:none;max-height:none;">
         </span>
       `;
     }

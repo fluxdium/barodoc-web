@@ -188,11 +188,13 @@
   min-width: 18mm;
   height: 18mm;
   vertical-align: middle;
+  overflow: visible !important;
 }
 
 .stamp-anchor.sm {
   min-width: 9mm;
   height: 9mm;
+  overflow: visible !important;
 }
 
 .stamp-anchor .in-label {
@@ -206,19 +208,23 @@
   font-size: 8.2pt;
 }
 
+img.stamp-overlay,
 .stamp-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  max-width: none;
+  max-height: none;
+  min-width: 0;
+  min-height: 0;
   pointer-events: none;
   object-fit: contain;
-  z-index: 5;
+  z-index: 10;
 }
 
 .stamp-overlay.sig-overlay {
   mix-blend-mode: multiply;
-  max-width: none;
 }
 
 .doc-recipient {
@@ -416,6 +422,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1mm;
+  overflow: visible;
 }
 
 /* Dense mode when quotation/statement has 8~12 line items so A4 never clips */
