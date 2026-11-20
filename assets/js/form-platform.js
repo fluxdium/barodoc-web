@@ -1672,52 +1672,146 @@
   }
 
   /* ========================================================================
-     9. High-Resolution A4 PNG Image Export (2x ~192 DPI, 100% Browser Local)
+     9. High-Resolution A4 PNG Image Export via html2canvas (scale: 2, #fff)
+     Captures exact A4 DOM (210mm x 297mm, tables, borders, fonts, stamps,
+     handwritten signatures) with transform: none on an unscaled clone.
      ======================================================================== */
-  function collectSameOriginCss() {
-    const chunks = [];
-    for (let i = 0; i < document.styleSheets.length; i++) {
-      const sheet = document.styleSheets[i];
-      try {
-        const href = sheet.href || '';
-        if (href && !href.startsWith(window.location.origin)) continue;
-        const rules = sheet.cssRules;
-        if (!rules) continue;
-        for (let j = 0; j < rules.length; j++) {
-          chunks.push(rules[j].cssText);
-        }
-      } catch (e) {}
-    }
-    return chunks.join('\n');
+  let html2canvasLoadPromise = null;
+
+  function loadScriptOnce(src) {
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.async = true;
+      s.onload = () => resolve();
+      s.onerror = () => {
+        s.remove();
+        reject(new Error(`Failed to load ${src}`));
+      };
+      document.head.appendChild(s);
+    });
   }
 
-  function renderFallbackCanvasPng(sheetEl, width, height) {
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, width, height);
-    ctx.strokeStyle = '#1b365d';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(48, 48, width - 96, height - 96);
-
-    ctx.fillStyle = '#111111';
-    const titleEl = sheetEl.querySelector('.doc-title');
-    ctx.font = 'bold 54px "Malgun Gothic", "Apple SD Gothic Neo", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText((titleEl ? titleEl.textContent : '바로서식 문서').trim(), width / 2, 160);
-
-    ctx.textAlign = 'left';
-    ctx.font = '26px "Malgun Gothic", "Apple SD Gothic Neo", sans-serif';
-    const lines = (sheetEl.innerText || '').split('\n').map((l) => l.trim()).filter(Boolean);
-    let y = 240;
-    for (let i = 0; i < lines.length && y < height - 100; i++) {
-      const line = lines[i].slice(0, 56);
-      ctx.fillText(line, 90, y);
-      y += 42;
+  function ensureHtml2Canvas() {
+    if (typeof window.html2canvas === 'function') {
+      return Promise.resolve(window.html2canvas);
     }
-    return canvas.toDataURL('image/png');
+    if (!html2canvasLoadPromise) {
+      html2canvasLoadPromise = loadScriptOnce('/assets/js/vendor/html2canvas.min.js')
+        .catch(() => loadScriptOnce('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'))
+        .then(() => {
+          if (typeof window.html2canvas !== 'function') {
+            throw new Error('html2canvas unavailable');
+          }
+          return window.html2canvas;
+        })
+        .catch((err) => {
+          html2canvasLoadPromise = null;
+          throw err;
+        });
+    }
+    return html2canvasLoadPromise;
+  }
+
+  async function waitForCloneAssets(clone) {
+    if (document.fonts && document.fonts.ready) {
+      try {
+        await document.fonts.ready;
+      } catch (e) {}
+    }
+    const imgs = Array.from(clone.querySelectorAll('img'));
+    await Promise.all(
+      imgs.map((img) => {
+        if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+        return new Promise((resolve) => {
+          img.addEventListener('load', resolve, { once: true });
+          img.addEventListener('error', resolve, { once: true });
+          setTimeout(resolve, 1500);
+        });
+      })
+    );
+  }
+
+  async function captureSheetAsCanvas(sheet) {
+    const h2c = await ensureHtml2Canvas();
+
+    // Mount unscaled A4 clone directly under body (zero transform: scale ancestor)
+    const host = document.createElement('div');
+    host.className = 'baro-png-capture-host no-print';
+    host.style.cssText =
+      'position:fixed;left:-10000px;top:0;width:210mm;height:297mm;margin:0;padding:0;' +
+      'background:#ffffff;transform:none;overflow:visible;pointer-events:none;z-index:-1;';
+
+    const clone = sheet.cloneNode(true);
+    clone.style.transform = 'none';
+    clone.style.margin = '0';
+    clone.style.boxShadow = 'none';
+    clone.style.width = '210mm';
+    clone.style.height = '297mm';
+    clone.style.minHeight = '297mm';
+    clone.style.maxHeight = '297mm';
+    clone.style.background = '#ffffff';
+
+    // Ensure transparent signature/stamp overlays render cleanly without blend-mode artifacts
+    clone.querySelectorAll('.stamp-overlay, .sig-overlay').forEach((img) => {
+      img.style.mixBlendMode = 'normal';
+    });
+
+    host.appendChild(clone);
+    document.body.appendChild(host);
+
+    try {
+      await waitForCloneAssets(clone);
+      // Let layout settle for 1 animation frame
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+      const rect = clone.getBoundingClientRect();
+      const targetW = Math.round(rect.width) || 794;
+      const targetH = Math.round(rect.height) || 1123;
+
+      const canvas = await h2c(clone, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        allowTaint: false,
+        logging: false,
+        width: targetW,
+        height: targetH,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: Math.max(1200, targetW + 40),
+        windowHeight: Math.max(1400, targetH + 40),
+      });
+      return canvas;
+    } finally {
+      host.remove();
+    }
+  }
+
+  function downloadCanvasAsPng(canvas, filename) {
+    return new Promise((resolve) => {
+      if (canvas.toBlob) {
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 4000);
+            resolve();
+            return;
+          }
+          SE.downloadDataUrl(canvas.toDataURL('image/png'), filename);
+          resolve();
+        }, 'image/png');
+      } else {
+        SE.downloadDataUrl(canvas.toDataURL('image/png'), filename);
+        resolve();
+      }
+    });
   }
 
   async function exportA4ToPng(formKey) {
@@ -1727,71 +1821,26 @@
       return;
     }
 
-    const cssText = collectSameOriginCss();
-    const sheetW = 794;
-    const sheetH = 1123;
-    const scale = 2; // 1588 x 2246 crisp PNG
+    const buttons = Array.from(document.querySelectorAll('[data-png-export]'));
+    buttons.forEach((b) => {
+      b.disabled = true;
+    });
+    U.showToast('고해상도 A4 PNG 이미지를 생성하고 있습니다...', 2200);
 
-    for (let idx = 0; idx < sheets.length; idx++) {
-      const sheet = sheets[idx];
-      const clone = sheet.cloneNode(true);
-      clone.style.margin = '0';
-      clone.style.boxShadow = 'none';
-      clone.style.width = `${sheetW}px`;
-      clone.style.height = `${sheetH}px`;
-      clone.style.minHeight = `${sheetH}px`;
-      clone.style.maxHeight = `${sheetH}px`;
-
-      const xml = new XMLSerializer().serializeToString(clone);
-      const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="${sheetW}" height="${sheetH}">
-          <foreignObject width="100%" height="100%">
-            <div xmlns="http://www.w3.org/1999/xhtml" style="width:${sheetW}px;height:${sheetH}px;background:#ffffff;">
-              <style>${cssText.replace(/<\/style>/gi, '')}</style>
-              ${xml}
-            </div>
-          </foreignObject>
-        </svg>
-      `;
-
-      let dataUrl = '';
-      try {
-        const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
-        const svgUrl = URL.createObjectURL(svgBlob);
-        dataUrl = await new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = () => {
-            try {
-              const canvas = document.createElement('canvas');
-              canvas.width = sheetW * scale;
-              canvas.height = sheetH * scale;
-              const ctx = canvas.getContext('2d');
-              ctx.fillStyle = '#ffffff';
-              ctx.fillRect(0, 0, canvas.width, canvas.height);
-              ctx.scale(scale, scale);
-              ctx.drawImage(img, 0, 0, sheetW, sheetH);
-              URL.revokeObjectURL(svgUrl);
-              resolve(canvas.toDataURL('image/png'));
-            } catch (err) {
-              URL.revokeObjectURL(svgUrl);
-              reject(err);
-            }
-          };
-          img.onerror = (err) => {
-            URL.revokeObjectURL(svgUrl);
-            reject(err);
-          };
-          img.src = svgUrl;
-        });
-      } catch (e) {
-        dataUrl = renderFallbackCanvasPng(sheet, sheetW * scale, sheetH * scale);
+    try {
+      for (let idx = 0; idx < sheets.length; idx++) {
+        const canvas = await captureSheetAsCanvas(sheets[idx]);
+        const suffix = sheets.length > 1 ? `-p${idx + 1}` : '';
+        await downloadCanvasAsPng(canvas, `baroseosik-${formKey}${suffix}-${U.todayISO()}.png`);
       }
-
-      const suffix = sheets.length > 1 ? `-p${idx + 1}` : '';
-      SE.downloadDataUrl(dataUrl, `baroseosik-${formKey}${suffix}-${U.todayISO()}.png`);
+      U.showToast(`고해상도 A4 PNG 이미지(${sheets.length}매)를 저장했습니다.`);
+    } catch (err) {
+      U.showToast('PNG 이미지 생성 중 오류가 발생했습니다. 다시 시도하거나 A4 PDF 저장을 이용해 주세요.', 4000);
+    } finally {
+      buttons.forEach((b) => {
+        b.disabled = false;
+      });
     }
-
-    U.showToast(`고해상도 A4 PNG 이미지(${sheets.length}매)를 저장했습니다.`);
   }
 
   /* ========================================================================
@@ -1866,6 +1915,7 @@
     createShareUrl,
     readShareHash,
     triggerShareCopy,
+    captureSheetAsCanvas,
     exportA4ToPng,
     openModal,
     closeActiveModal,
