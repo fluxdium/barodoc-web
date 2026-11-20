@@ -1230,8 +1230,9 @@ textarea {
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow-y: auto;
+  overflow-y: scroll;
   overflow-x: hidden;
+  scrollbar-gutter: stable;
   flex: 1;
   min-height: 520px;
 }
@@ -1311,7 +1312,8 @@ textarea {
 
 .a4-scale-container {
   transform-origin: top center;
-  transition: transform 0.12s ease;
+  flex-shrink: 0;
+  will-change: transform;
 }
 
 /* ==========================================================================
