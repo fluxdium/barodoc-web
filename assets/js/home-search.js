@@ -18,8 +18,7 @@
     const countEl = document.getElementById('homeResultCount');
     const utilitySection = document.getElementById('calculators');
     const formsSection = document.getElementById('tools');
-    const formGrid = document.getElementById('homeFormsGrid');
-    const utilGrid = document.getElementById('homeUtilityGrid');
+    const groupBoxes = Array.from(document.querySelectorAll('[data-group-box]'));
 
     if (!searchInput || !tiles.length) return;
 
@@ -77,6 +76,13 @@
 
       const totalVisible = visibleForms + visibleUtils;
 
+      groupBoxes.forEach((box) => {
+        const hasVisibleTile = Array.from(box.querySelectorAll('[data-dir-tile]')).some(
+          (t) => t.style.display !== 'none'
+        );
+        box.style.display = hasVisibleTile ? '' : 'none';
+      });
+
       if (formsSection) {
         formsSection.style.display = visibleForms > 0 ? '' : 'none';
       }
@@ -104,10 +110,6 @@
         b.classList.toggle('active', !isSearching && tabKey === activeCat);
         b.setAttribute('aria-selected', !isSearching && tabKey === activeCat ? 'true' : 'false');
       });
-
-      // Avoid unused ref lint
-      void formGrid;
-      void utilGrid;
     }
 
     searchInput.addEventListener('input', applyFilter);

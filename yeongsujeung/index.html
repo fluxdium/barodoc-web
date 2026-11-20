@@ -65,7 +65,7 @@
     </div>
     <div class="mobile-drawer" id="mobileDrawer">
       <div class="mobile-drawer-grid">
-        <a class="mobile-drawer-link active" href="/#tools">무료 서식 12종</a><a class="mobile-drawer-link" href="/stamp/">도장 만들기</a><a class="mobile-drawer-link" href="/#calculators">실무 계산기 3종</a><a class="mobile-drawer-link" href="/guide/">실무 가이드</a>
+        <a class="mobile-drawer-link active" href="/#tools">무료 서식 52종</a><a class="mobile-drawer-link" href="/stamp/">도장 만들기</a><a class="mobile-drawer-link" href="/#calculators">실무 계산기 6종</a><a class="mobile-drawer-link" href="/guide/">실무 가이드</a>
       </div>
     </div>
   </header>
@@ -119,6 +119,8 @@
               </div>
               <button type="button" class="btn-quick-share" id="shareLinkBtn" data-share-trigger title="입력 내용을 링크 해시(#d=)에 담아 서버 저장 없이 상대방에게 전달합니다">🔗 상대방 입력 요청 링크 복사</button>
             </div>
+
+            <div id="tradeChainBar" class="trade-chain-bar no-print" style="display:none;"></div>
 
             <div class="editor-body">
               <div id="liveValidationBar" class="live-validation-wrap no-print"></div>
@@ -235,22 +237,22 @@
         <aside class="editorial-aside" aria-label="관련 무료 서식 및 계산기">
           
         <div class="aside-card" style="background:var(--brand-blue-soft);border-color:#bfdbfe;">
-          <h3>함께 쓰면 좋은 계산기</h3>
-          <p style="margin:0 0 10px;font-size:13.5px;color:var(--text-secondary);">공급가액과 부가세(10%), 프리랜서 3.3% 세후 금액을 즉시 확인하세요.</p>
-          <a href="/calc/vat/" class="btn btn-primary btn-block btn-sm">무료 부가세(VAT) 계산기 →</a>
+          <h3>함께 쓰면 좋은 실무 계산기</h3>
+          <p style="margin:0 0 10px;font-size:13.5px;color:var(--text-secondary);">이 서식과 관련된 2026년 최신 법령 기준 금액을 1초 만에 미리 계산해 보세요.</p>
+          <a href="/calc/vat/" class="btn btn-primary btn-block btn-sm" style="margin-top:0px;">무료 부가세(VAT) 계산기 →</a>
         </div>
         
           
         <div class="aside-card aside-stamp-cta">
           <h3>● 한글 투명 도장이 필요하신가요?</h3>
-          <p>원형 막도장·회사 사각 직인을 5초 만에 만들어 투명 PNG로 저장하고 모든 서식에 바로 찍을 수 있습니다.</p>
+          <p>원형 막도장·회사 사각 직인을 5초 만에 만들어 투명 PNG로 저장하고 52종 모든 서식에 바로 찍을 수 있습니다.</p>
           <a href="/stamp/" class="btn btn-seal btn-block btn-sm">무료 도장 만들기 →</a>
         </div>
         
           <div class="aside-card">
             <h3>다른 무료 서식 바로가기</h3>
             <ul class="aside-links">
-              <li><a href="/sajikseo/"><span>사직서 양식</span><span>→</span></a></li><li><a href="/chayongjeung/"><span>차용증 양식</span><span>→</span></a></li><li><a href="/wiimjang/"><span>위임장 양식</span><span>→</span></a></li><li><a href="/jaejik/"><span>재직증명서 양식</span><span>→</span></a></li><li><a href="/gyeonjeokseo/"><span>견적서 양식</span><span>→</span></a></li><li><a href="/geunro/"><span>근로계약서 양식</span><span>→</span></a></li><li><a href="/georae/"><span>거래명세서 양식</span><span>→</span></a></li><li><a href="/gyeongryeok/"><span>경력증명서 양식</span><span>→</span></a></li><li><a href="/jichul/"><span>지출결의서 양식</span><span>→</span></a></li><li><a href="/simal/"><span>경위서·시말서 양식</span><span>→</span></a></li><li><a href="/habuiseo/"><span>합의서 양식</span><span>→</span></a></li><li><a href="/stamp/"><span>도장 만들기</span><span>→</span></a></li>
+              <li><a href="/gyeonjeokseo/"><span>견적서 양식</span><span>→</span></a></li><li><a href="/georae/"><span>거래명세서 양식</span><span>→</span></a></li><li><a href="/baljuseo/"><span>발주서 양식</span><span>→</span></a></li><li><a href="/cheongguseo/"><span>청구서 양식</span><span>→</span></a></li><li><a href="/gani-yeongsujeung/"><span>간이영수증 양식</span><span>→</span></a></li><li><a href="/jichul/"><span>지출결의서 양식</span><span>→</span></a></li><li><a href="/pumuiseo/"><span>품의서 양식</span><span>→</span></a></li><li><a href="/gianseo/"><span>기안서 양식</span><span>→</span></a></li><li><a href="/hoeuilok/"><span>회의록 양식</span><span>→</span></a></li><li><a href="/eopmuilji/"><span>업무일지·주간업무보고서 양식</span><span>→</span></a></li><li><a href="/sajikseo/"><span>사직서 양식</span><span>→</span></a></li><li><a href="/#tools"><span><strong>전체 52종 서식 보기</strong></span><span>→</span></a></li>
             </ul>
           </div>
         </aside>
@@ -273,7 +275,7 @@
         <div class="footer-col">
           <h4>무료 서식 &amp; 도장 도구</h4>
           <ul class="footer-links">
-            <li><a href="/sajikseo/">사직서 양식</a></li><li><a href="/chayongjeung/">차용증 양식</a></li><li><a href="/wiimjang/">위임장 양식</a></li><li><a href="/jaejik/">재직증명서 양식</a></li><li><a href="/gyeonjeokseo/">견적서 양식</a></li><li><a href="/geunro/">근로계약서 양식</a></li><li><a href="/georae/">거래명세서 양식</a></li><li><a href="/gyeongryeok/">경력증명서 양식</a></li><li><a href="/yeongsujeung/">영수증 양식</a></li><li><a href="/jichul/">지출결의서 양식</a></li><li><a href="/simal/">경위서·시말서 양식</a></li><li><a href="/habuiseo/">합의서 양식</a></li><li><a href="/stamp/">도장 만들기</a></li><li><a href="/calc/vat/">부가세 계산기</a></li><li><a href="/calc/annual-leave/">연차 계산기</a></li><li><a href="/calc/brokerage/">중개수수료 계산기</a></li>
+            <li><a href="/sajikseo/">사직서 양식</a></li><li><a href="/jaejik/">재직증명서 양식</a></li><li><a href="/geunro/">근로계약서 양식</a></li><li><a href="/gyeonjeokseo/">견적서 양식</a></li><li><a href="/georae/">거래명세서 양식</a></li><li><a href="/baljuseo/">발주서 양식</a></li><li><a href="/cheongguseo/">청구서 양식</a></li><li><a href="/chayongjeung/">차용증 양식</a></li><li><a href="/imdaecha/">부동산 임대차계약서 양식</a></li><li><a href="/wiimjang/">위임장 양식</a></li><li><a href="/habuiseo/">합의서 양식</a></li><li><a href="/naeyong/">내용증명서 양식</a></li><li><a href="/stamp/">도장 만들기</a></li><li><a href="/#tools"><strong>전체 52종 무료 서식 →</strong></a></li><li><a href="/calc/vat/">부가세 계산기</a></li><li><a href="/calc/annual-leave/">연차 계산기</a></li><li><a href="/calc/brokerage/">중개수수료 계산기</a></li><li><a href="/calc/severance/">퇴직금 계산기</a></li><li><a href="/calc/unemployment/">실업급여 계산기</a></li><li><a href="/calc/weekly-holiday/">주휴수당 계산기</a></li>
           </ul>
         </div>
         <div class="footer-col">

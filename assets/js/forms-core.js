@@ -45,6 +45,18 @@
     let state = loadDraft() || clone(def.getInitialData());
     let sharedPayload = null;
 
+    // 0. Check for Trade Document Chain Carry-Over (?from=chain)
+    if (P && typeof P.consumeTradeChainIfRequested === 'function') {
+      const carried = P.consumeTradeChainIfRequested(formKey, clone(def.getInitialData()));
+      if (carried && carried.state) {
+        state = carried.state;
+        saveDraft();
+        setTimeout(() => {
+          U.showToast(`${carried.sourceLabel}의 입력 내용을 이어받아 자동으로 채웠습니다.`, 3800);
+        }, 280);
+      }
+    }
+
     // 1. Check for serverless shared link (#d=...) BEFORE rendering
     if (P && typeof P.readShareHash === 'function') {
       sharedPayload = await P.readShareHash(formKey);
@@ -300,6 +312,11 @@
         setMobileTab(cur === 'preview' ? 'edit' : 'preview');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
+    }
+
+    const tradeChainBar = document.getElementById('tradeChainBar');
+    if (P && typeof P.renderTradeChainBar === 'function' && tradeChainBar) {
+      P.renderTradeChainBar(tradeChainBar, formKey, () => state);
     }
 
     updateProfileButtonState();

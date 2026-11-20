@@ -770,8 +770,141 @@
   }
 
   /* ========================================================================
-     3. Declarative Schema Compiler (Enables 52+ Forms with Pure Data Configs)
+     3. Declarative Schema Compiler + Shared A4 Helpers (Enables 52+ Forms)
      ======================================================================== */
+  function calcLineTotals(items, vatMode) {
+    let supplyTotal = 0;
+    let vatTotal = 0;
+    const rows = (items || []).map((item) => {
+      const qty = Math.max(0, U.parseNumber(item.qty));
+      const unitPrice = Math.max(0, U.parseNumber(item.unitPrice));
+      const raw = qty * unitPrice;
+      let supply = 0;
+      let vat = 0;
+      if (vatMode === 'exempt') {
+        supply = raw;
+        vat = 0;
+      } else if (vatMode === 'included') {
+        supply = Math.round(raw / 1.1);
+        vat = raw - supply;
+      } else {
+        supply = raw;
+        vat = Math.round(raw * 0.1);
+      }
+      supplyTotal += supply;
+      vatTotal += vat;
+      return {
+        name: item.name || '',
+        spec: item.spec || '',
+        qty,
+        unitPrice,
+        supply,
+        vat,
+        total: supply + vat,
+        note: item.note || '',
+      };
+    });
+    return { rows, supplyTotal, vatTotal, grandTotal: supplyTotal + vatTotal };
+  }
+
+  function valOrEmpty(v, placeholder) {
+    if (v !== null && v !== undefined && String(v).trim()) return U.escapeHtml(v);
+    return `<span class="doc-empty">${U.escapeHtml(placeholder || '')}</span>`;
+  }
+
+  function renderFieldHtml(f, s) {
+    const val = s[f.name] !== undefined ? s[f.name] : '';
+    if (f.type === 'textarea') {
+      const minH = f.minHeight ? ` style="min-height:${f.minHeight}px;"` : '';
+      return `<div class="field"><label>${U.escapeHtml(f.label)}</label><textarea${minH} data-field="${U.escapeHtml(f.name)}" placeholder="${U.escapeHtml(f.placeholder || '')}">${U.escapeHtml(val)}</textarea></div>`;
+    }
+    if (f.type === 'select') {
+      return `<div class="field"><label>${U.escapeHtml(f.label)}</label><select data-field="${U.escapeHtml(f.name)}"${f.rerender ? ' data-rerender="true"' : ''}>${(f.options || [])
+        .map((opt) => {
+          const ov = typeof opt === 'string' ? opt : opt.value;
+          const ol = typeof opt === 'string' ? opt : opt.label;
+          return `<option value="${U.escapeHtml(ov)}" ${val === ov ? 'selected' : ''}>${U.escapeHtml(ol)}</option>`;
+        })
+        .join('')}</select></div>`;
+    }
+    if (f.type === 'checkbox') {
+      return `<div class="field"><label class="checkbox-row"><input type="checkbox" data-field="${U.escapeHtml(f.name)}"${f.rerender ? ' data-rerender="true"' : ''} ${val ? 'checked' : ''}> ${U.escapeHtml(f.label)}</label></div>`;
+    }
+    if (f.type === 'money') {
+      const n = U.parseNumber(val);
+      return `<div class="field"><label>${U.escapeHtml(f.label)}</label><input type="number" min="0" step="${f.step || 1000}" data-field="${U.escapeHtml(f.name)}" data-money-live="true" value="${U.escapeHtml(val)}" placeholder="${U.escapeHtml(f.placeholder || '')}"><div class="field-converted" data-money-box="${U.escapeHtml(f.name)}"><div><strong>한글:</strong> ${U.escapeHtml(U.formatKoreanCurrency(n))}</div><div><strong>한자:</strong> ${U.escapeHtml(U.formatHanjaCurrency(n))} (₩${U.formatNumber(n)})</div></div></div>`;
+    }
+    if (f.type === 'items') {
+      const items = Array.isArray(s[f.name]) ? s[f.name] : [];
+      const vatField = f.vatField || 'vatMode';
+      const vatMode = f.useVat ? (s[vatField] || 'separate') : 'exempt';
+      const totals = calcLineTotals(items, vatMode);
+      return `
+        <div class="schema-items-block" data-items-field="${U.escapeHtml(f.name)}">
+          ${
+            f.useVat
+              ? `<div class="field">
+                  <label>부가가치세 (VAT) 방식</label>
+                  <select data-field="${U.escapeHtml(vatField)}" data-rerender="true">
+                    <option value="separate" ${vatMode === 'separate' ? 'selected' : ''}>부가세 별도 (+10% 자동 계산)</option>
+                    <option value="included" ${vatMode === 'included' ? 'selected' : ''}>부가세 포함 (공급가액·세액 역산)</option>
+                    <option value="exempt" ${vatMode === 'exempt' ? 'selected' : ''}>면세 / 부가세 없음 (0%)</option>
+                  </select>
+                </div>`
+              : ''
+          }
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span style="font-size:12.5px;font-weight:700;color:var(--text-secondary);">항목 목록 (${items.length}건)</span>
+            <button type="button" class="btn btn-outline btn-sm" data-schema-add-item="${U.escapeHtml(f.name)}">+ 항목 추가</button>
+          </div>
+          ${items
+            .map(
+              (it, idx) => `
+            <div class="line-item-card">
+              <div class="line-item-head">
+                <span>항목 #${idx + 1}</span>
+                ${items.length > 1 ? `<button type="button" class="btn btn-ghost btn-sm" data-schema-del-item="${U.escapeHtml(f.name)}" data-idx="${idx}" style="padding:2px 6px;font-size:11.5px;color:var(--seal-red);">삭제</button>` : ''}
+              </div>
+              <div class="line-item-grid">
+                <input type="text" data-si-field="${U.escapeHtml(f.name)}" data-si-key="name" data-idx="${idx}" value="${U.escapeHtml(it.name || '')}" placeholder="${U.escapeHtml(f.namePlaceholder || '품목 / 내역명')}">
+                <input type="text" data-si-field="${U.escapeHtml(f.name)}" data-si-key="spec" data-idx="${idx}" value="${U.escapeHtml(it.spec || '')}" placeholder="${U.escapeHtml(f.specPlaceholder || '규격 / 단위')}">
+              </div>
+              <div class="line-item-nums">
+                <input type="number" min="0" step="1" data-si-field="${U.escapeHtml(f.name)}" data-si-key="qty" data-idx="${idx}" value="${U.escapeHtml(it.qty !== undefined ? it.qty : 1)}" placeholder="수량">
+                <input type="number" min="0" step="100" data-si-field="${U.escapeHtml(f.name)}" data-si-key="unitPrice" data-idx="${idx}" value="${U.escapeHtml(it.unitPrice !== undefined ? it.unitPrice : 0)}" placeholder="단가(원)">
+                <input type="text" data-si-field="${U.escapeHtml(f.name)}" data-si-key="note" data-idx="${idx}" value="${U.escapeHtml(it.note || '')}" placeholder="비고">
+              </div>
+            </div>
+          `
+            )
+            .join('')}
+          <div class="summary-box" data-si-summary="${U.escapeHtml(f.name)}">
+            ${f.useVat ? `<div class="summary-line"><span>공급가액 합계</span><strong>${U.formatNumber(totals.supplyTotal)}원</strong></div><div class="summary-line"><span>부가세 (VAT)</span><strong>${U.formatNumber(totals.vatTotal)}원</strong></div>` : ''}
+            <div class="summary-line total"><span>총 합계금액</span><strong>${U.formatNumber(totals.grandTotal)}원</strong></div>
+            <div style="font-size:12px;color:#bfdbfe;margin-top:4px;">${U.escapeHtml(U.formatKoreanCurrency(totals.grandTotal))} / ${U.escapeHtml(U.formatHanjaCurrency(totals.grandTotal))}</div>
+          </div>
+        </div>
+      `;
+    }
+    return `<div class="field"><label>${U.escapeHtml(f.label)}</label><input type="${U.escapeHtml(f.type || 'text')}" data-field="${U.escapeHtml(f.name)}" value="${U.escapeHtml(val)}" placeholder="${U.escapeHtml(f.placeholder || '')}"></div>`;
+  }
+
+  function renderSectionFields(secFields, s) {
+    const out = [];
+    let i = 0;
+    while (i < secFields.length) {
+      const cur = secFields[i];
+      if (cur.half && i + 1 < secFields.length && secFields[i + 1].half) {
+        out.push(`<div class="field-row">${renderFieldHtml(cur, s)}${renderFieldHtml(secFields[i + 1], s)}</div>`);
+        i += 2;
+      } else {
+        out.push(renderFieldHtml(cur, s));
+        i += 1;
+      }
+    }
+    return out.join('');
+  }
+
   function compileSchema(schema) {
     const sections = schema.sections || [];
     const fields = [];
@@ -782,7 +915,7 @@
     return {
       stampSlots: schema.stampSlots || [{ key: 'writer', label: '작성자 (인)', defaultName: '홍길동', defaultShape: 'circle', sizeMm: 17 }],
       defaultStampMm: schema.defaultStampMm || 17,
-      getSuggestedStampName: schema.getSuggestedStampName || ((s) => s.name || s.writerName || '홍길동'),
+      getSuggestedStampName: schema.getSuggestedStampName || ((s) => s.name || s.writerName || s.supplierName || s.companyName || '홍길동'),
       platformMeta: {
         profileTargets: schema.profileTargets || [],
         presets: schema.presets || {},
@@ -793,68 +926,232 @@
       getInitialData: () => {
         const data = {};
         fields.forEach((f) => {
-          data[f.name] = typeof f.default === 'function' ? f.default() : (f.default !== undefined ? f.default : '');
+          if (f.type === 'items' && f.useVat && !data[f.vatField || 'vatMode']) {
+            data[f.vatField || 'vatMode'] = 'separate';
+          }
+          data[f.name] = typeof f.default === 'function' ? f.default() : (f.default !== undefined ? JSON.parse(JSON.stringify(f.default)) : '');
         });
         return Object.assign(data, typeof schema.extraInitial === 'function' ? schema.extraInitial() : {});
       },
       getSampleData: () => {
         const base = {};
         fields.forEach((f) => {
-          base[f.name] = typeof f.sample === 'function' ? f.sample() : (f.sample !== undefined ? f.sample : (typeof f.default === 'function' ? f.default() : f.default || ''));
+          if (f.type === 'items' && f.useVat && !base[f.vatField || 'vatMode']) {
+            base[f.vatField || 'vatMode'] = 'separate';
+          }
+          base[f.name] = typeof f.sample === 'function' ? f.sample() : (f.sample !== undefined ? JSON.parse(JSON.stringify(f.sample)) : (typeof f.default === 'function' ? f.default() : (f.default !== undefined ? JSON.parse(JSON.stringify(f.default)) : '')));
         });
         return Object.assign(base, typeof schema.extraSample === 'function' ? schema.extraSample() : {});
       },
       renderEditor: (container, s, api) => {
-        const html = sections
-          .map((sec) => {
-            const inner = (sec.fields || [])
-              .map((f) => {
-                const val = s[f.name] !== undefined ? s[f.name] : '';
-                if (f.type === 'textarea') {
-                  return `<div class="field"><label>${U.escapeHtml(f.label)}</label><textarea data-field="${U.escapeHtml(f.name)}" placeholder="${U.escapeHtml(f.placeholder || '')}">${U.escapeHtml(val)}</textarea></div>`;
-                }
-                if (f.type === 'select') {
-                  return `<div class="field"><label>${U.escapeHtml(f.label)}</label><select data-field="${U.escapeHtml(f.name)}">${(f.options || [])
-                    .map((opt) => {
-                      const ov = typeof opt === 'string' ? opt : opt.value;
-                      const ol = typeof opt === 'string' ? opt : opt.label;
-                      return `<option value="${U.escapeHtml(ov)}" ${val === ov ? 'selected' : ''}>${U.escapeHtml(ol)}</option>`;
-                    })
-                    .join('')}</select></div>`;
-                }
-                if (f.type === 'checkbox') {
-                  return `<div class="field"><label class="checkbox-row"><input type="checkbox" data-field="${U.escapeHtml(f.name)}" ${val ? 'checked' : ''}> ${U.escapeHtml(f.label)}</label></div>`;
-                }
-                if (f.type === 'money') {
-                  const n = U.parseNumber(val);
-                  return `<div class="field"><label>${U.escapeHtml(f.label)}</label><input type="number" min="0" step="${f.step || 1000}" data-field="${U.escapeHtml(f.name)}" data-money-live="true" value="${U.escapeHtml(val)}" placeholder="${U.escapeHtml(f.placeholder || '')}"><div class="field-converted" data-money-box="${U.escapeHtml(f.name)}"><div><strong>한글:</strong> ${U.escapeHtml(U.formatKoreanCurrency(n))}</div><div><strong>한자:</strong> ${U.escapeHtml(U.formatHanjaCurrency(n))}</div></div></div>`;
-                }
-                return `<div class="field"><label>${U.escapeHtml(f.label)}</label><input type="${U.escapeHtml(f.type || 'text')}" data-field="${U.escapeHtml(f.name)}" value="${U.escapeHtml(val)}" placeholder="${U.escapeHtml(f.placeholder || '')}"></div>`;
-              })
-              .join('');
-            return `<div class="form-group-card"><div class="form-group-title">${U.escapeHtml(sec.title)}</div>${inner}</div>`;
-          })
+        container.innerHTML = sections
+          .map((sec) => `<div class="form-group-card"><div class="form-group-title">${U.escapeHtml(sec.title)}</div>${renderSectionFields(sec.fields || [], s)}</div>`)
           .join('');
-        container.innerHTML = html;
 
         container.querySelectorAll('[data-field]').forEach((el) => {
           const key = el.getAttribute('data-field');
+          const rerender = el.getAttribute('data-rerender') === 'true';
           const ev = el.type === 'checkbox' || el.tagName === 'SELECT' ? 'change' : 'input';
           el.addEventListener(ev, () => {
             const val = el.type === 'checkbox' ? el.checked : el.value;
-            api.updateField(key, val);
+            api.updateField(key, val, { rerenderEditor: rerender });
             if (el.getAttribute('data-money-live') === 'true') {
               const box = container.querySelector(`[data-money-box="${key}"]`);
               if (box) {
                 const n = U.parseNumber(val);
-                box.innerHTML = `<div><strong>한글:</strong> ${U.escapeHtml(U.formatKoreanCurrency(n))}</div><div><strong>한자:</strong> ${U.escapeHtml(U.formatHanjaCurrency(n))}</div>`;
+                box.innerHTML = `<div><strong>한글:</strong> ${U.escapeHtml(U.formatKoreanCurrency(n))}</div><div><strong>한자:</strong> ${U.escapeHtml(U.formatHanjaCurrency(n))} (₩${U.formatNumber(n)})</div>`;
               }
+            }
+          });
+        });
+
+        // Schema dynamic items bindings
+        container.querySelectorAll('[data-si-field]').forEach((el) => {
+          el.addEventListener('input', () => {
+            const fname = el.getAttribute('data-si-field');
+            const subKey = el.getAttribute('data-si-key');
+            const idx = Number(el.getAttribute('data-idx'));
+            if (Array.isArray(s[fname]) && s[fname][idx]) {
+              s[fname][idx][subKey] = el.value;
+              api.setState(s, { rerenderEditor: false });
+              const fDef = fields.find((x) => x.name === fname) || {};
+              const vatMode = fDef.useVat ? (s[fDef.vatField || 'vatMode'] || 'separate') : 'exempt';
+              const totals = calcLineTotals(s[fname], vatMode);
+              const box = container.querySelector(`[data-si-summary="${fname}"]`);
+              if (box) {
+                box.innerHTML = `
+                  ${fDef.useVat ? `<div class="summary-line"><span>공급가액 합계</span><strong>${U.formatNumber(totals.supplyTotal)}원</strong></div><div class="summary-line"><span>부가세 (VAT)</span><strong>${U.formatNumber(totals.vatTotal)}원</strong></div>` : ''}
+                  <div class="summary-line total"><span>총 합계금액</span><strong>${U.formatNumber(totals.grandTotal)}원</strong></div>
+                  <div style="font-size:12px;color:#bfdbfe;margin-top:4px;">${U.escapeHtml(U.formatKoreanCurrency(totals.grandTotal))} / ${U.escapeHtml(U.formatHanjaCurrency(totals.grandTotal))}</div>
+                `;
+              }
+            }
+          });
+        });
+
+        container.querySelectorAll('[data-schema-add-item]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const fname = btn.getAttribute('data-schema-add-item');
+            if (!Array.isArray(s[fname])) s[fname] = [];
+            if (s[fname].length >= 10) {
+              U.showToast('A4 1장 기준 최대 10개 항목까지 입력할 수 있습니다.');
+              return;
+            }
+            s[fname].push({ name: '', spec: '식', qty: 1, unitPrice: 0, note: '' });
+            api.rerenderAll();
+          });
+        });
+
+        container.querySelectorAll('[data-schema-del-item]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const fname = btn.getAttribute('data-schema-del-item');
+            const idx = Number(btn.getAttribute('data-idx'));
+            if (Array.isArray(s[fname]) && s[fname].length > 1) {
+              s[fname].splice(idx, 1);
+              api.rerenderAll();
             }
           });
         });
       },
       renderA4: schema.renderA4,
     };
+  }
+
+  /* ========================================================================
+     3.5 Trade Document Chain Carry-Over (견적서 -> 발주서 -> 거래명세서 -> 청구서 -> 영수증)
+     ======================================================================== */
+  const CHAIN_KEY = 'barodoc_trade_chain_v1';
+  const TRADE_CHAIN_STEPS = [
+    { key: 'gyeonjeokseo', label: '견적서', path: '/gyeonjeokseo/' },
+    { key: 'baljuseo', label: '발주서', path: '/baljuseo/' },
+    { key: 'georae', label: '거래명세서', path: '/georae/' },
+    { key: 'cheongguseo', label: '청구서', path: '/cheongguseo/' },
+    { key: 'yeongsujeung', label: '영수증', path: '/yeongsujeung/' },
+  ];
+
+  function extractTradeEnvelope(formKey, state) {
+    const items = Array.isArray(state.items) ? state.items : [];
+    const vatMode = state.vatMode || 'separate';
+    const totals = items.length ? calcLineTotals(items, vatMode) : null;
+    const grandTotal = totals ? totals.grandTotal : U.parseNumber(state.amount || 0);
+    const firstNames = items.map((i) => i.name).filter(Boolean).slice(0, 3).join(', ');
+    return {
+      sourceKey: formKey,
+      sourceLabel: (TRADE_CHAIN_STEPS.find((x) => x.key === formKey) || { label: '이전 문서' }).label,
+      clientName: state.clientName || state.payerName || '',
+      clientBizNo: state.clientBizNo || '',
+      clientCeo: state.clientCeo || '',
+      clientPhone: state.clientPhone || '',
+      clientContact: state.clientContact || '',
+      supplierName: state.supplierName || state.issuerName || '',
+      supplierBizNo: state.supplierBizNo || state.issuerBizOrId || '',
+      supplierCeo: state.supplierCeo || '',
+      supplierPhone: state.supplierPhone || state.issuerPhone || '',
+      supplierAddress: state.supplierAddress || state.issuerAddress || '',
+      supplierBizType: state.supplierBizType || '',
+      supplierBizItem: state.supplierBizItem || '',
+      projectTitle: state.projectTitle || state.itemDesc || firstNames || '',
+      bankAccount: state.bankAccount || '',
+      vatMode,
+      items: items.length ? JSON.parse(JSON.stringify(items)) : [],
+      grandTotal,
+      notes: state.notes || state.note || '',
+      savedAt: Date.now(),
+    };
+  }
+
+  function applyTradeEnvelope(formKey, baseState, env) {
+    if (!env) return baseState;
+    const s = JSON.parse(JSON.stringify(baseState));
+    const mapIfHas = (k, v) => {
+      if (v !== undefined && v !== '' && Object.prototype.hasOwnProperty.call(s, k)) {
+        s[k] = v;
+      }
+    };
+    mapIfHas('clientName', env.clientName);
+    mapIfHas('clientBizNo', env.clientBizNo);
+    mapIfHas('clientCeo', env.clientCeo);
+    mapIfHas('clientPhone', env.clientPhone);
+    mapIfHas('clientContact', env.clientContact);
+    mapIfHas('supplierName', env.supplierName);
+    mapIfHas('supplierBizNo', env.supplierBizNo);
+    mapIfHas('supplierCeo', env.supplierCeo);
+    mapIfHas('supplierPhone', env.supplierPhone);
+    mapIfHas('supplierAddress', env.supplierAddress);
+    mapIfHas('supplierBizType', env.supplierBizType);
+    mapIfHas('supplierBizItem', env.supplierBizItem);
+    mapIfHas('projectTitle', env.projectTitle);
+    mapIfHas('bankAccount', env.bankAccount);
+    mapIfHas('vatMode', env.vatMode);
+    if (Array.isArray(env.items) && env.items.length && Object.prototype.hasOwnProperty.call(s, 'items')) {
+      s.items = JSON.parse(JSON.stringify(env.items));
+    }
+    if (formKey === 'yeongsujeung' || formKey === 'gani-yeongsujeung' || formKey === 'ipgeum') {
+      mapIfHas('payerName', env.clientName);
+      mapIfHas('issuerName', env.supplierName);
+      mapIfHas('issuerBizOrId', env.supplierBizNo);
+      mapIfHas('issuerPhone', env.supplierPhone);
+      mapIfHas('issuerAddress', env.supplierAddress);
+      if (env.grandTotal > 0 && Object.prototype.hasOwnProperty.call(s, 'amount')) {
+        s.amount = String(env.grandTotal);
+      }
+      mapIfHas('itemDesc', env.projectTitle || (env.items || []).map((i) => i.name).filter(Boolean).join(', '));
+    }
+    if (env.notes && Object.prototype.hasOwnProperty.call(s, 'notes')) {
+      s.notes = env.notes;
+    }
+    return s;
+  }
+
+  function renderTradeChainBar(barEl, formKey, getStateFn) {
+    if (!barEl) return;
+    const idx = TRADE_CHAIN_STEPS.findIndex((x) => x.key === formKey);
+    if (idx === -1) {
+      barEl.style.display = 'none';
+      return;
+    }
+    const nextSteps = TRADE_CHAIN_STEPS.slice(idx + 1);
+    if (!nextSteps.length) {
+      barEl.style.display = 'none';
+      return;
+    }
+    barEl.style.display = 'flex';
+    barEl.innerHTML = `
+      <span class="trade-chain-label">🔄 거래 문서 이어쓰기:</span>
+      <div class="trade-chain-btns">
+        ${nextSteps
+          .map(
+            (st) =>
+              `<button type="button" class="trade-chain-btn" data-chain-target="${U.escapeHtml(st.path)}">${U.escapeHtml(st.label)}로 이어쓰기 →</button>`
+          )
+          .join('')}
+      </div>
+    `;
+    barEl.querySelectorAll('[data-chain-target]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        try {
+          const env = extractTradeEnvelope(formKey, getStateFn());
+          sessionStorage.setItem(CHAIN_KEY, JSON.stringify(env));
+        } catch (e) {}
+        window.location.href = btn.getAttribute('data-chain-target') + '?from=chain';
+      });
+    });
+  }
+
+  function consumeTradeChainIfRequested(formKey, baseState) {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('from') !== 'chain') return null;
+    try {
+      const raw = sessionStorage.getItem(CHAIN_KEY);
+      if (!raw) return null;
+      const env = JSON.parse(raw);
+      return {
+        state: applyTradeEnvelope(formKey, baseState, env),
+        sourceLabel: env.sourceLabel || '이전 거래 문서',
+      };
+    } catch (e) {
+      return null;
+    }
   }
 
   /* ========================================================================
@@ -1553,6 +1850,10 @@
     FORM_META,
     getMeta,
     compileSchema,
+    calcLineTotals,
+    valOrEmpty,
+    renderTradeChainBar,
+    consumeTradeChainIfRequested,
     loadProfile,
     saveProfile,
     hasProfileData,
