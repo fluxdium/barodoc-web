@@ -108,7 +108,7 @@
           <div class="summary-line"><span>공급가액 합계</span><strong>${U.formatNumber(totals.supplyTotal)}원</strong></div>
           <div class="summary-line"><span>부가세 (VAT)</span><strong>${U.formatNumber(totals.vatTotal)}원</strong></div>
           <div class="summary-line total"><span>총 합계금액</span><strong>${U.formatNumber(totals.grandTotal)}원</strong></div>
-          <div style="font-size:12px;color:#bfdbfe;margin-top:4px;">${U.escapeHtml(U.formatKoreanCurrency(totals.grandTotal))}</div>
+          <div style="font-size:12px;color:#bfdbfe;margin-top:4px;">${U.escapeHtml(U.formatKoreanCurrency(totals.grandTotal))} / ${U.escapeHtml(U.formatHanjaCurrency(totals.grandTotal))}</div>
         </div>
       </div>
     `;
@@ -129,7 +129,7 @@
               <div class="summary-line"><span>공급가액 합계</span><strong>${U.formatNumber(totals.supplyTotal)}원</strong></div>
               <div class="summary-line"><span>부가세 (VAT)</span><strong>${U.formatNumber(totals.vatTotal)}원</strong></div>
               <div class="summary-line total"><span>총 합계금액</span><strong>${U.formatNumber(totals.grandTotal)}원</strong></div>
-              <div style="font-size:12px;color:#bfdbfe;margin-top:4px;">${U.escapeHtml(U.formatKoreanCurrency(totals.grandTotal))}</div>
+              <div style="font-size:12px;color:#bfdbfe;margin-top:4px;">${U.escapeHtml(U.formatKoreanCurrency(totals.grandTotal))} / ${U.escapeHtml(U.formatHanjaCurrency(totals.grandTotal))}</div>
             `;
           }
         }
@@ -393,7 +393,7 @@
 
           <div class="biz-total-banner">
             <span class="biz-total-label">합계금액 ${vatLabel}</span>
-            <span class="biz-total-korean">${U.escapeHtml(U.formatKoreanCurrency(totals.grandTotal))}</span>
+            <span class="biz-total-korean">${U.escapeHtml(U.formatKoreanCurrency(totals.grandTotal))} <small style="font-weight:500;color:#444;">(${U.escapeHtml(U.formatHanjaCurrency(totals.grandTotal))})</small></span>
             <span class="biz-total-number">(₩ ${U.formatNumber(totals.grandTotal)})</span>
           </div>
 
@@ -702,7 +702,7 @@
           <div class="contract-item">
             <strong>6. 임 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;금 :</strong>
             <div style="padding-left:4mm;margin-top:1mm;">
-              - ${wageLabelMap[s.wageType] || '월급'} : <strong>${U.formatNumber(amt)}원</strong> (${U.escapeHtml(U.formatKoreanCurrency(amt))})<br>
+              - ${wageLabelMap[s.wageType] || '월급'} : <strong>${U.formatNumber(amt)}원</strong> (${U.escapeHtml(U.formatKoreanCurrency(amt))} / ${U.escapeHtml(U.formatHanjaCurrency(amt))})<br>
               - 상여금 및 제수당 : ${U.escapeHtml(s.allowanceText || '별도 약정 없음')}<br>
               - 임금지급일 : ${U.escapeHtml(s.payDay || '매월 25일')}${/(휴일|전일|전영업일)/.test(s.payDay || '') ? '' : ' (휴일의 경우는 전일 지급)'}<br>
               - 지급방법 : ${U.escapeHtml(s.payMethod || '근로자 명의 예금통장에 입금')}
@@ -761,30 +761,32 @@
 
   function updateMinWageAlert(alertEl, s) {
     const amt = U.parseNumber(s.wageAmount);
+    const hanjaLine = `${U.formatKoreanCurrency(amt)} / ${U.formatHanjaCurrency(amt)}`;
     if (s.wageType === 'hourly') {
+      const withJuhyu = Math.round(amt * 1.2);
       if (amt < MIN_WAGE_HOURLY_2026) {
         alertEl.className = 'field-alert danger';
-        alertEl.textContent = `⚠ 2026년 법정 최저시급(${U.formatNumber(MIN_WAGE_HOURLY_2026)}원) 미만입니다. 최저임금법 위반 소지가 있으니 확인해 주세요.`;
+        alertEl.textContent = `⚠ 2026년 법정 최저시급(${U.formatNumber(MIN_WAGE_HOURLY_2026)}원) 미만입니다! 주 15시간 이상 개근 시 주휴수당 포함 최소 12,384원 이상 지급해야 합니다. (${hanjaLine})`;
       } else {
         alertEl.className = 'field-alert ok';
-        alertEl.textContent = `✓ 2026년 최저시급(${U.formatNumber(MIN_WAGE_HOURLY_2026)}원) 이상입니다.`;
+        alertEl.textContent = `✓ 2026년 최저시급(${U.formatNumber(MIN_WAGE_HOURLY_2026)}원) 이상 · 주 15시간 이상 근무 시 주휴수당 포함 실질 시급 약 ${U.formatNumber(withJuhyu)}원 (${hanjaLine})`;
       }
     } else if (s.wageType === 'monthly') {
       if (amt < MIN_WAGE_MONTHLY_2026) {
         alertEl.className = 'field-alert warn';
-        alertEl.textContent = `⚠ 주 40시간 기준 2026년 최저월급(${U.formatNumber(MIN_WAGE_MONTHLY_2026)}원, 209시간 기준)보다 낮습니다. 단시간 근로가 아니라면 확인이 필요합니다.`;
+        alertEl.textContent = `⚠ 주 40시간 기준 2026년 최저월급(${U.formatNumber(MIN_WAGE_MONTHLY_2026)}원, 주휴 포함 209시간)보다 낮습니다. 단시간 근로 여부를 확인해 주세요. (${hanjaLine})`;
       } else {
         alertEl.className = 'field-alert ok';
-        alertEl.textContent = `✓ 주 40시간 기준 2026년 최저월급(${U.formatNumber(MIN_WAGE_MONTHLY_2026)}원) 이상입니다.`;
+        alertEl.textContent = `✓ 주 40시간 기준 2026년 최저월급(${U.formatNumber(MIN_WAGE_MONTHLY_2026)}원, 주휴 포함) 이상입니다. (${hanjaLine})`;
       }
     } else {
       const monthly = Math.round(amt / 12);
       if (monthly < MIN_WAGE_MONTHLY_2026) {
         alertEl.className = 'field-alert warn';
-        alertEl.textContent = `⚠ 월 환산액(${U.formatNumber(monthly)}원)이 2026년 최저월급(${U.formatNumber(MIN_WAGE_MONTHLY_2026)}원) 미만입니다.`;
+        alertEl.textContent = `⚠ 월 환산액(${U.formatNumber(monthly)}원)이 2026년 최저월급(${U.formatNumber(MIN_WAGE_MONTHLY_2026)}원) 미만입니다. (${hanjaLine})`;
       } else {
         alertEl.className = 'field-alert ok';
-        alertEl.textContent = `✓ 월 환산액 약 ${U.formatNumber(monthly)}원 (2026년 최저임금 기준 충족)`;
+        alertEl.textContent = `✓ 월 환산액 약 ${U.formatNumber(monthly)}원 (2026년 최저임금·주휴 기준 충족 · ${hanjaLine})`;
       }
     }
   }
@@ -1040,7 +1042,7 @@
 
             <div class="biz-total-banner">
               <span class="biz-total-label">합계금액</span>
-              <span class="biz-total-korean">${U.escapeHtml(U.formatKoreanCurrency(totals.grandTotal))}</span>
+              <span class="biz-total-korean">${U.escapeHtml(U.formatKoreanCurrency(totals.grandTotal))} <small style="font-weight:500;color:#444;">(${U.escapeHtml(U.formatHanjaCurrency(totals.grandTotal))})</small></span>
               <span class="biz-total-number">(₩ ${U.formatNumber(totals.grandTotal)})</span>
             </div>
 

@@ -269,6 +269,105 @@
     return () => scheduleRescale(false);
   }
 
+  // Korean Choseong (초성) Search Helpers
+  const CHOSEONG_LIST = [
+    'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ',
+    'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ',
+  ];
+
+  function extractChoseong(str) {
+    if (!str) return '';
+    let out = '';
+    for (let i = 0; i < str.length; i++) {
+      const code = str.charCodeAt(i);
+      if (code >= 0xac00 && code <= 0xd7a3) {
+        const idx = Math.floor((code - 0xac00) / 588);
+        out += CHOSEONG_LIST[idx];
+      } else {
+        out += str[i];
+      }
+    }
+    return out;
+  }
+
+  function isChoseongOnly(str) {
+    return /^[ㄱ-ㅎ\s]+$/.test(str || '');
+  }
+
+  function matchKoreanQuery(query, text) {
+    const q = String(query || '').trim().toLowerCase().replace(/\s+/g, '');
+    if (!q) return true;
+    const target = String(text || '').toLowerCase().replace(/\s+/g, '');
+    if (target.includes(q)) return true;
+    const targetCho = extractChoseong(target);
+    const qCho = extractChoseong(q);
+    if (isChoseongOnly(q) && targetCho.includes(q)) return true;
+    if (qCho && targetCho.includes(qCho) && q.length >= 2 && isChoseongOnly(q)) return true;
+    return false;
+  }
+
+  // URL-Safe Base64 + Serverless Deflate Compression for Share Links (#d=...)
+  function bytesToBase64Url(bytes) {
+    let bin = '';
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+    }
+    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  function base64UrlToBytes(b64) {
+    let norm = String(b64 || '').replace(/-/g, '+').replace(/_/g, '/');
+    while (norm.length % 4) norm += '=';
+    const bin = atob(norm);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+
+  async function compressToHash(obj) {
+    const json = JSON.stringify(obj);
+    const rawBytes = new TextEncoder().encode(json);
+    if (typeof CompressionStream !== 'undefined') {
+      try {
+        const cs = new CompressionStream('deflate-raw');
+        const writer = cs.writable.getWriter();
+        writer.write(rawBytes);
+        writer.close();
+        const compressed = new Uint8Array(await new Response(cs.readable).arrayBuffer());
+        if (compressed.length < rawBytes.length) {
+          return 'z:' + bytesToBase64Url(compressed);
+        }
+      } catch (e) {}
+    }
+    return 'u:' + bytesToBase64Url(rawBytes);
+  }
+
+  async function decompressFromHash(token) {
+    if (!token || typeof token !== 'string') return null;
+    try {
+      let mode = 'u';
+      let payload = token;
+      if (token.startsWith('z:') || token.startsWith('u:')) {
+        mode = token[0];
+        payload = token.slice(2);
+      }
+      const bytes = base64UrlToBytes(payload);
+      if (mode === 'z') {
+        if (typeof DecompressionStream === 'undefined') return null;
+        const ds = new DecompressionStream('deflate-raw');
+        const writer = ds.writable.getWriter();
+        writer.write(bytes);
+        writer.close();
+        const plain = new Uint8Array(await new Response(ds.readable).arrayBuffer());
+        return JSON.parse(new TextDecoder().decode(plain));
+      }
+      return JSON.parse(new TextDecoder().decode(bytes));
+    } catch (e) {
+      return null;
+    }
+  }
+
   function triggerPrint() {
     showToast('인쇄 창에서 대상을 "PDF로 저장"으로 선택하고 "배경 그래픽"을 켜면 선명한 A4 PDF가 저장됩니다.', 4200);
     setTimeout(() => {
@@ -295,5 +394,9 @@
     showToast,
     setupA4Scaler,
     triggerPrint,
+    extractChoseong,
+    matchKoreanQuery,
+    compressToHash,
+    decompressFromHash,
   };
 })(window);

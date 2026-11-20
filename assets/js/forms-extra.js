@@ -431,7 +431,7 @@
             .join('')}
           <div class="summary-box" id="expSummaryBox">
             <div class="summary-line total"><span>지출 합계금액</span><strong>${U.formatNumber(total)}원</strong></div>
-            <div style="font-size:12px;color:#bfdbfe;margin-top:4px;">${U.escapeHtml(U.formatKoreanCurrency(total))}</div>
+            <div style="font-size:12px;color:#bfdbfe;margin-top:4px;">${U.escapeHtml(U.formatKoreanCurrency(total))} / ${U.escapeHtml(U.formatHanjaCurrency(total))}</div>
           </div>
         </div>
 
@@ -451,7 +451,7 @@
             const sum = s.items.reduce((a, r) => a + Math.max(0, U.parseNumber(r.amount)), 0);
             const box = container.querySelector('#expSummaryBox');
             if (box) {
-              box.innerHTML = `<div class="summary-line total"><span>지출 합계금액</span><strong>${U.formatNumber(sum)}원</strong></div><div style="font-size:12px;color:#bfdbfe;margin-top:4px;">${U.escapeHtml(U.formatKoreanCurrency(sum))}</div>`;
+              box.innerHTML = `<div class="summary-line total"><span>지출 합계금액</span><strong>${U.formatNumber(sum)}원</strong></div><div style="font-size:12px;color:#bfdbfe;margin-top:4px;">${U.escapeHtml(U.formatKoreanCurrency(sum))} / ${U.escapeHtml(U.formatHanjaCurrency(sum))}</div>`;
             }
           }
         });
@@ -513,7 +513,7 @@
 
           <div class="biz-total-banner">
             <span class="biz-total-label">지출 총액</span>
-            <span class="biz-total-korean">${U.escapeHtml(U.formatKoreanCurrency(total))}</span>
+            <span class="biz-total-korean">${U.escapeHtml(U.formatKoreanCurrency(total))} <small style="font-weight:500;color:#444;">(${U.escapeHtml(U.formatHanjaCurrency(total))})</small></span>
             <span class="biz-total-number">(₩ ${U.formatNumber(total)})</span>
           </div>
 

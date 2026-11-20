@@ -216,6 +216,11 @@
   z-index: 5;
 }
 
+.stamp-overlay.sig-overlay {
+  mix-blend-mode: multiply;
+  max-width: none;
+}
+
 .doc-recipient {
   margin-top: 8mm;
   font-size: 14pt;
