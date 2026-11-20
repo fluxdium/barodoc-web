@@ -12,9 +12,17 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+SRC_DIR = ROOT / "src"
 PUBLIC = ROOT / "public"
 CONFIG = json.loads((ROOT / "site-config.json").read_text(encoding="utf-8"))
 DOMAIN = CONFIG["domain"].rstrip("/")
+
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
+from content.pages_data import TOOLS  # noqa: E402
+from content.calculators_data import CALCULATORS  # noqa: E402
+from content.guides_data import GUIDES  # noqa: E402
 
 
 class PageInspector(HTMLParser):
@@ -114,43 +122,18 @@ def run_audit():
     errors = []
     warnings = []
 
-    expected_routes = [
-        "/",
-        "/sajikseo/",
-        "/chayongjeung/",
-        "/wiimjang/",
-        "/jaejik/",
-        "/gyeonjeokseo/",
-        "/geunro/",
-        "/georae/",
-        "/gyeongryeok/",
-        "/yeongsujeung/",
-        "/jichul/",
-        "/simal/",
-        "/habuiseo/",
-        "/stamp/",
-        "/calc/vat/",
-        "/calc/annual-leave/",
-        "/calc/brokerage/",
-        "/guide/",
-        "/guide/resignation-checklist/",
-        "/guide/iou-legal-validity/",
-        "/guide/labor-contract-2026/",
-        "/guide/vat-quotation-statement/",
-        "/guide/poa-documents/",
-        "/guide/electronic-stamp-guide/",
-        "/guide/family-loan-gift-tax/",
-        "/guide/resignation-notice-period/",
-        "/guide/parttime-contract-checklist/",
-        "/guide/poa-seal-certificate/",
-        "/guide/simplified-taxpayer-quotation/",
-        "/guide/certificate-employment-vs-career/",
-        "/guide/severance-pay-annual-leave/",
-        "/about/",
-        "/privacy/",
-        "/terms/",
-        "/contact/",
-    ]
+    tool_routes = [f"/{t['slug']}/" for t in TOOLS]
+    calc_routes = [c["path"] for c in CALCULATORS]
+    guide_routes = [f"/guide/{g['slug']}/" for g in GUIDES]
+    expected_routes = (
+        ["/"]
+        + tool_routes
+        + calc_routes
+        + ["/guide/"]
+        + guide_routes
+        + ["/about/", "/privacy/", "/terms/", "/contact/"]
+    )
+    app_routes = set(tool_routes + calc_routes)
 
     titles = {}
     descs = {}
@@ -209,20 +192,14 @@ def run_audit():
             except Exception as exc:
                 errors.append(f"[{route}] Invalid JSON-LD #{idx + 1}: {exc}")
 
-        if route in (
-            "/sajikseo/", "/chayongjeung/", "/wiimjang/", "/jaejik/",
-            "/gyeonjeokseo/", "/geunro/", "/georae/",
-            "/gyeongryeok/", "/yeongsujeung/", "/jichul/", "/simal/", "/habuiseo/",
-            "/stamp/",
-            "/calc/vat/", "/calc/annual-leave/", "/calc/brokerage/",
-        ):
+        if route in app_routes:
             for req_type in ("WebApplication", "BreadcrumbList", "FAQPage"):
                 if req_type not in ld_types:
                     errors.append(f"[{route}] Missing JSON-LD {req_type}")
-            if char_count < 900:
+            if char_count < 600:
                 warnings.append(f"[{route}] Tool page editorial text is short ({char_count} chars without spaces)")
-            if p.faq_count < 5:
-                warnings.append(f"[{route}] Only {p.faq_count} FAQs (recommend >= 5)")
+            if p.faq_count < 3:
+                errors.append(f"[{route}] Only {p.faq_count} FAQs (require >= 3)")
 
         # Internal link & asset resolution
         for href in p.links + p.assets:

@@ -8,96 +8,117 @@ from content.pages_data import TOOLS
 from content.guides_data import GUIDES
 from content.calculators_data import CALCULATORS
 
+TOOL_DISPLAY_NAMES = {
+    "simal": "시말서",
+    "wiimjang": "표준위임장",
+    "habuiseo": "합의서(일반·민사)",
+    "geunro": "표준근로계약서",
+    "imdaecha": "부동산 임대차계약서(전세·월세)",
+    "imdae-tongji": "임대차 계약 갱신·해지 통지서",
+}
+
 TOOL_SHORT_DESCS = {
     "sajikseo": "퇴사 의사 · 퇴직일 작성",
-    "chayongjeung": "금액 한글·한자 자동 변환",
+    "chayongjeung": "금액 한글·한자 · 연 20% 검증",
     "wiimjang": "민원 · 은행 · 부동산 대리",
     "jaejik": "재직기간 계산 · 회사 직인",
-    "gyeonjeokseo": "품목 · 부가세 자동 계산",
-    "geunro": "2026 최저임금 자동 점검",
-    "georae": "적색 · 청색 2매 동시 출력",
+    "gyeonjeokseo": "품목 · 부가세 · 발주서 이어쓰기",
+    "geunro": "2026 최저임금 · 주휴 자동 점검",
+    "georae": "적색 · 청색 2매 · 청구서 이어쓰기",
     "gyeongryeok": "이직 · 자격증 경력 증빙",
     "yeongsujeung": "계약금 · 대금 수령 확인",
     "jichul": "회사 경비 · 출장비 합계",
-    "simal": "업무 경위 · 재발방지 보고",
-    "habuiseo": "사고 · 분쟁 합의 양측 날인",
-    "stamp": "투명 PNG · 서식 바로 날인",
-}
-
-TOOL_CATEGORIES = {
-    "sajikseo": ["hr"],
-    "jaejik": ["hr"],
-    "gyeongryeok": ["hr"],
-    "simal": ["hr"],
-    "geunro": ["labor"],
-    "gyeonjeokseo": ["biz"],
-    "georae": ["biz"],
-    "jichul": ["biz"],
-    "yeongsujeung": ["biz", "money"],
-    "chayongjeung": ["money", "legal"],
-    "wiimjang": ["money", "legal"],
-    "habuiseo": ["labor", "legal"],
-    "stamp": ["tools"],
+    "simal": "과실 반성 · 재발방지 서약",
+    "habuiseo": "일반·민사 분쟁 양측 날인",
+    "stamp": "투명 PNG · 52종 서식 바로 날인",
 }
 
 TOOL_SEARCH_ALIASES = {
     "sajikseo": "사직서 퇴직서 퇴사 사표 인사",
     "chayongjeung": "차용증 금전소비대차계약서 돈빌리기 이자 가족차용증",
-    "wiimjang": "위임장 대리인 주민센터 은행 부동산 차량 민원",
+    "wiimjang": "표준위임장 위임장 대리인 주민센터 은행 부동산 차량 민원",
     "jaejik": "재직증명서 재직확인서 직장 대출 회사증명",
     "gyeonjeokseo": "견적서 부가세 단가 품목 거래처 B2B",
-    "geunro": "표준근로계약서 근로계약서 알바 아르바이트 정규직 계약직 노무 최저임금",
+    "geunro": "표준근로계약서 근로계약서 정규직 노무 최저임금",
     "georae": "거래명세서 거래명세표 납품서 공급자 공급받는자 세금",
-    "gyeongryeok": "경력증명서 퇴직증명서 사용증명서 이직 자격증",
-    "yeongsujeung": "영수증 간이영수증 현금영수증 계약금 대금 수령확인서",
+    "gyeongryeok": "경력증명서 사용증명서 이직 자격증",
+    "yeongsujeung": "영수증 현금영수증 계약금 대금 수령확인서",
     "jichul": "지출결의서 경비정산 출장비 품의서 법인카드",
-    "simal": "경위서 시말서 반성문 사유서 사건경위",
-    "habuiseo": "합의서 처벌불원서 교통사고 접촉사고 분쟁 손해배상",
+    "simal": "시말서 반성문 과실보고서 사유서",
+    "habuiseo": "합의서 일반합의서 민사합의서 처벌불원서 분쟁 손해배상",
     "stamp": "온라인 도장 만들기 막도장 인감 직인 법인직인 결재도장 서명",
 }
 
 CALC_SHORT_DESCS = {
     "vat": "공급가액 +10% · 포함 역산",
-    "annual-leave": "입사일 · 회계연도 · 수당",
+    "annual-leave": "입사일 · 회계연도 · 연차수당",
     "brokerage": "주택 · 오피스텔 · 월세 복비",
+    "severance": "재직일수 · 3개월 평균임금",
+    "unemployment": "2026 상·하한액 · 120~270일",
+    "weekly-holiday": "주 15시간 · 실질 시급 자동",
 }
 
 CALC_SEARCH_ALIASES = {
     "vat": "부가세 계산기 부가가치세 VAT 세금 공급가액",
     "annual-leave": "연차 계산기 연차수당 휴가 입사일 퇴사정산",
     "brokerage": "중개수수료 계산기 복비 부동산 매매 전세 월세",
+    "severance": "퇴직금 계산기 평균임금 IRP 퇴사정산",
+    "unemployment": "실업급여 계산기 구직급여 권고사직 고용보험",
+    "weekly-holiday": "주휴수당 계산기 알바주휴수당 최저시급 주급",
 }
 
-HOME_CATEGORIES = [
-    ("all", "전체"),
-    ("hr", "인사·퇴사"),
-    ("labor", "계약·노무"),
-    ("biz", "거래·경영"),
-    ("money", "금전·부동산"),
-    ("legal", "일상·법률·민원"),
-    ("tools", "계산기·도장"),
+FORM_CATEGORY_GROUPS = [
+    ("hr", "인사·퇴사", "퇴사·증명·휴가·근태·출장 표준 서식"),
+    ("labor", "계약·노무", "근로계약·연봉·급여·프리랜서·NDA·동업"),
+    ("biz", "거래·경영", "견적→발주→거래명세→청구→영수 이어쓰기 · 결재"),
+    ("money", "금전·부동산", "차용·보관·지불각서 · 전세/월세·매매계약"),
+    ("legal", "일상·법률·민원", "위임장·합의서·내용증명·탄원서·사실확인"),
 ]
 
 
 def render_home_body(cfg):
-    form_tiles = []
-    stamp_tool = None
-    for t in TOOLS:
-        if t["kind"] == "stamp":
-            stamp_tool = t
-            continue
-        short_desc = TOOL_SHORT_DESCS.get(t["key"], t["card_desc"])
-        cats = ",".join(TOOL_CATEGORIES.get(t["key"], ["biz"]))
-        aliases = TOOL_SEARCH_ALIASES.get(t["key"], t["short_name"])
-        form_tiles.append(
+    stamp_tool = next((t for t in TOOLS if t["kind"] == "stamp"), None)
+    all_forms = [t for t in TOOLS if t["kind"] == "form"]
+    cat_counts = {k: sum(1 for t in all_forms if t.get("category") == k) for k, _, _ in FORM_CATEGORY_GROUPS}
+    util_count = (1 if stamp_tool else 0) + len(CALCULATORS)
+    total_count = len(all_forms) + util_count
+
+    home_categories = (
+        [("all", f"전체 ({total_count})", "전체")]
+        + [(k, f"{label} ({cat_counts[k]})", label) for k, label, _ in FORM_CATEGORY_GROUPS]
+        + [("tools", f"계산기·도장 ({util_count})", "계산기·도장")]
+    )
+
+    cat_groups_html = []
+    for cat_key, cat_label, cat_sub in FORM_CATEGORY_GROUPS:
+        group_forms = [t for t in all_forms if t.get("category") == cat_key]
+        tiles_html = []
+        for t in group_forms:
+            disp_name = TOOL_DISPLAY_NAMES.get(t["key"], t["short_name"])
+            short_desc = t.get("home_desc") or TOOL_SHORT_DESCS.get(t["key"], t["card_desc"])
+            aliases = t.get("search_aliases") or TOOL_SEARCH_ALIASES.get(t["key"], disp_name)
+            tiles_html.append(
+                f"""
+                <a class="action-tile tile-form" href="/{t['slug']}/" data-dir-tile data-group="form" data-cat-group="{cat_key}" data-title="{disp_name}" data-categories="{cat_key}" data-keywords="{aliases}">
+                  <div class="action-tile-top">
+                    <h3>{disp_name}</h3>
+                    <span class="tile-arrow" aria-hidden="true">→</span>
+                  </div>
+                  <p>{short_desc}</p>
+                </a>
+                """
+            )
+        cat_groups_html.append(
             f"""
-            <a class="action-tile tile-form" href="/{t['slug']}/" data-dir-tile data-group="form" data-title="{t['short_name']}" data-categories="{cats}" data-keywords="{aliases}">
-              <div class="action-tile-top">
-                <h3>{t['short_name']}</h3>
-                <span class="tile-arrow" aria-hidden="true">→</span>
+            <div class="home-cat-group" data-group-box="{cat_key}">
+              <div class="home-cat-group-head">
+                <h3><span class="dot-swatch blue" aria-hidden="true"></span>{cat_label} <span class="cat-count-pill">{len(group_forms)}종</span></h3>
+                <span class="sub-note">{cat_sub}</span>
               </div>
-              <p>{short_desc}</p>
-            </a>
+              <div class="tools-grid">
+                {''.join(tiles_html)}
+              </div>
+            </div>
             """
         )
 
@@ -130,16 +151,16 @@ def render_home_body(cfg):
         )
 
     cat_tabs_html = "".join(
-        f'<button type="button" class="cat-tab-btn{" active" if key == "all" else ""}" role="tab" aria-selected="{"true" if key == "all" else "false"}" data-cat-tab="{key}" data-cat-label="{label}">{label}</button>'
-        for key, label in HOME_CATEGORIES
+        f'<button type="button" class="cat-tab-btn{" active" if key == "all" else ""}" role="tab" aria-selected="{"true" if key == "all" else "false"}" data-cat-tab="{key}" data-cat-label="{plain}">{label}</button>'
+        for key, label, plain in home_categories
     )
 
     home_faqs = [
-        ("바로서식은 정말 100% 무료인가요? 회원가입이 필요한가요?", "네, 바로서식에서 제공하는 12종 무료 서식 작성기, 온라인 투명 도장·자필 서명 도구, 실무 계산기 3종은 회원가입, 로그인, 결제 없이 누구나 무제한 무료로 이용할 수 있습니다."),
-        ("작성한 사직서나 차용증의 개인정보가 서버에 저장되나요?", "아니요. 바로서식은 별도의 백엔드 서버나 데이터베이스를 사용하지 않는 100% 브라우저 로컬 처리 웹사이트입니다. 입력하신 이름, 주소, 주민등록번호, 금액, 자필 서명, 상대방 공유 링크(#d=)까지 모든 내용은 외부 서버로 절대 전송되지 않습니다."),
-        ("상대방과 함께 작성하거나 서명을 받을 수 있나요?", "네! 작성 중인 서식에서 '상대방 입력 요청 링크 복사' 버튼을 누르면 내가 입력한 정보와 도장·서명이 압축 링크(#d=)에 담깁니다. 상대방이 링크를 열어 본인 정보와 손가락 서명·도장만 추가한 뒤 바로 A4 PDF로 저장할 수 있습니다."),
-        ("내 개인·회사 정보를 저장해 두고 여러 서식에 자동 입력할 수 있나요?", "네! 상단의 '내 정보 불러오기'에서 이름·연락처·주소·상호·사업자번호·기본 도장/서명을 1번만 브라우저(localStorage)에 저장해 두면 모든 서식에서 클릭 한 번으로 자동 채움됩니다."),
-        ("한글(HWP)이나 워드, 엑셀 프로그램이 없어도 PDF·PNG로 저장할 수 있나요?", "네, 크롬·엣지·사파리·웨일 등 일반 웹 브라우저만 있으면 충분합니다. 작성 완료 후 'A4 인쇄 / PDF 저장' 또는 'PNG 저장' 버튼으로 깨짐 없는 고화질 A4 파일로 바로 저장할 수 있습니다."),
+        ("바로서식은 정말 100% 무료인가요? 회원가입이 필요한가요?", "네, 바로서식에서 제공하는 52종 무료 A4 표준 서식, 온라인 투명 도장·손가락 자필 서명 도구, 실무 계산기 6종은 회원가입, 로그인, 결제 없이 누구나 무제한 무료로 이용할 수 있습니다."),
+        ("작성한 사직서나 차용증·임대차계약서의 개인정보가 서버에 저장되나요?", "아니요. 바로서식은 별도의 백엔드 서버나 데이터베이스를 사용하지 않는 100% 브라우저 로컬 처리 웹사이트입니다. 입력하신 이름, 주소, 주민등록번호, 금액, 자필 서명, 상대방 공유 링크(#d=)까지 모든 내용은 외부 서버로 절대 전송되지 않습니다."),
+        ("견적서 내용을 발주서·거래명세서·청구서·영수증으로 이어서 쓸 수 있나요?", "네! 견적서, 발주서, 거래명세서, 청구서 상단의 '이어쓰기' 버튼을 누르면 품목·수량·단가·거래처 정보가 다음 문서로 자동 채움되어 반복 입력 없이 10초 만에 거래 문서를 완성할 수 있습니다."),
+        ("상대방과 함께 작성하거나 비대면으로 서명을 받을 수 있나요?", "네! 작성 중인 서식에서 '상대방 입력 요청 링크 복사' 버튼을 누르면 내가 입력한 정보와 도장·서명이 압축 링크(#d=)에 담깁니다. 상대방이 링크를 열어 본인 정보와 손가락 서명·도장만 추가한 뒤 바로 A4 PDF로 저장할 수 있습니다."),
+        ("내 개인·회사 정보를 저장해 두고 52종 서식에 자동 입력할 수 있나요?", "네! 상단의 '내 정보 불러오기'에서 이름·연락처·주소·상호·사업자번호·기본 도장/서명을 1번만 브라우저(localStorage)에 저장해 두면 52종 모든 서식에서 클릭 한 번으로 자동 채움됩니다."),
     ]
 
     faq_html = "".join(
@@ -157,13 +178,13 @@ def render_home_body(cfg):
         <section class="home-hero">
           <div class="container">
             <div class="home-hero-compact">
-              <h1>가입 없이 바로 쓰는 무료 서식 · 도장 · 계산기</h1>
+              <h1>가입 없이 바로 쓰는 무료 서식 52종 · 도장 · 계산기 6종</h1>
               <p class="hero-desc">빈칸 입력 · 손가락 서명 · 상대방 링크 공유 · A4 PDF/PNG 저장까지 브라우저에서 1분 만에 끝납니다.</p>
 
               <div class="home-search-wrap">
                 <div class="home-search-box">
                   <span class="home-search-icon" aria-hidden="true">🔍</span>
-                  <input type="search" id="homeSearchInput" autocomplete="off" placeholder="서식 검색 (초성 지원: ㅅㅈㅅ 사직서, ㅊㅇㅈ 차용증, ㄱㅈㅅ 견적서, ㄷㅈ 도장)" aria-label="무료 서식 및 계산기 빠른 검색">
+                  <input type="search" id="homeSearchInput" autocomplete="off" placeholder="52종 서식 · 6종 계산기 검색 (초성 지원: ㅅㅈㅅ, ㅊㅇㅈ, ㄱㅈㅅ, ㅌㅈㄱ, ㄴㅇㅈ...)" aria-label="무료 서식 및 계산기 빠른 검색">
                   <button type="button" id="homeSearchClear" class="home-search-clear" style="display:none;" aria-label="검색어 지우기">×</button>
                 </div>
                 <div class="home-search-hints">
@@ -171,7 +192,8 @@ def render_home_body(cfg):
                   <button type="button" class="search-demo-chip" data-search-demo="ㅅㅈㅅ">ㅅㅈㅅ</button>
                   <button type="button" class="search-demo-chip" data-search-demo="ㅊㅇㅈ">ㅊㅇㅈ</button>
                   <button type="button" class="search-demo-chip" data-search-demo="ㄱㅈㅅ">ㄱㅈㅅ</button>
-                  <button type="button" class="search-demo-chip" data-search-demo="ㄱㄹ">ㄱㄹ</button>
+                  <button type="button" class="search-demo-chip" data-search-demo="ㅇㄷㅊ">ㅇㄷㅊ</button>
+                  <button type="button" class="search-demo-chip" data-search-demo="ㅌㅈㄱ">ㅌㅈㄱ</button>
                   <button type="button" class="search-demo-chip" data-search-demo="ㄷㅈ">ㄷㅈ</button>
                 </div>
               </div>
@@ -183,27 +205,15 @@ def render_home_body(cfg):
           </div>
         </section>
 
-        <section class="home-section-compact" id="tools">
-          <div class="container">
-            <div class="home-section-head">
-              <h2><span class="dot-swatch blue" aria-hidden="true"></span>무료 A4 서식</h2>
-              <span class="sub-note" id="homeResultCount">전체 16종 바로 작성 가능</span>
-            </div>
-            <div class="tools-grid" id="homeFormsGrid">
-              {''.join(form_tiles)}
-            </div>
-          </div>
-        </section>
-
         <section class="home-section-compact second-band" id="calculators">
           <div class="container">
             <div class="home-section-head">
               <h2>
                 <span class="dot-swatch red" aria-hidden="true"></span>온라인 도장
                 <span style="color:var(--border-strong);margin:0 2px;">·</span>
-                <span class="dot-swatch green" aria-hidden="true"></span>실무 계산기 3종
+                <span class="dot-swatch green" aria-hidden="true"></span>실무 계산기 6종
               </h2>
-              <span class="sub-note">투명 PNG 날인 · 2026 법령 기준</span>
+              <span class="sub-note" id="homeResultCount">전체 {total_count}종 바로 작성 가능</span>
             </div>
             <div class="utility-row-grid" id="homeUtilityGrid">
               {''.join(utility_tiles)}
@@ -211,11 +221,17 @@ def render_home_body(cfg):
           </div>
         </section>
 
+        <section class="home-section-compact" id="tools">
+          <div class="container">
+            {''.join(cat_groups_html)}
+          </div>
+        </section>
+
         <section class="container" id="homeEmptyState" style="display:none;padding:28px 20px;">
           <div class="home-empty-card">
-            <p><strong>일치하는 서식이나 도구가 없습니다.</strong></p>
-            <p class="sub">초성(예: ㅅㅈㅅ, ㅊㅇㅈ)이나 다른 키워드로 다시 검색해 보세요.</p>
-            <button type="button" class="btn btn-primary btn-sm" id="homeResetSearchBtn">전체 서식 다시 보기</button>
+            <p><strong>일치하는 서식이나 계산기가 없습니다.</strong></p>
+            <p class="sub">초성(예: ㅅㅈㅅ, ㅊㅇㅈ, ㅇㄷㅊ, ㅌㅈㄱ)이나 다른 키워드로 다시 검색해 보세요.</p>
+            <button type="button" class="btn btn-primary btn-sm" id="homeResetSearchBtn">전체 59종 다시 보기</button>
           </div>
         </section>
 
@@ -236,7 +252,7 @@ def render_home_body(cfg):
         <section class="editorial-section">
           <div class="container-narrow guide-article">
             <h2>{cfg['site_name']} 이용 안내 및 자주 묻는 질문</h2>
-            <p>{cfg['site_name']}은 대한민국 직장인, 소상공인, 프리랜서, 개인이 일상과 업무에서 가장 자주 찾는 표준 A4 공식 서식 12종(사직서, 차용증, 위임장, 재직증명서, 견적서, 표준근로계약서, 거래명세서, 경력증명서, 영수증, 지출결의서, 경위서·시말서, 합의서), 한글 투명 도장·손가락 자필 서명 도구, 그리고 실무 계산기 3종(부가세·연차·중개수수료)을 로그인 없이 무료로 제공하는 웹 도구 서비스입니다.</p>
+            <p>{cfg['site_name']}은 대한민국 직장인, 소상공인, 프리랜서, 개인이 일상과 업무에서 가장 자주 찾는 5개 카테고리 총 52종 표준 A4 공식 서식(인사·퇴사 12종, 계약·노무 12종, 거래·경영 12종, 금전·부동산 8종, 일상·법률·민원 8종), 한글 투명 도장·손가락 자필 서명 도구, 그리고 실무 계산기 6종(부가세·연차·중개수수료·퇴직금·실업급여·주휴수당)을 로그인 없이 무료로 제공하는 웹 플랫폼입니다.</p>
 
             <h3>자주 묻는 질문 (FAQ)</h3>
             <div class="faq-list">

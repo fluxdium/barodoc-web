@@ -139,9 +139,9 @@ def build(cfg):
         build_base_html(
             cfg,
             path="/",
-            title=f"{cfg['site_name']} — 가입 없이 바로 쓰는 무료 서식 · 도장 · 계산기",
-            description="바로서식에서 회원가입 없이 사직서·차용증·위임장·재직증명서·견적서·근로계약서·거래명세서, 투명 도장 만들기, 부가세·연차·중개수수료 계산기를 브라우저에서 무료로 이용하고 A4 PDF로 저장하세요.",
-            keywords="바로서식, 무료 서식, 사직서 양식, 차용증 양식, 위임장 양식, 재직증명서 양식, 견적서 양식, 근로계약서 양식, 거래명세서 양식, 무료 온라인 도장 만들기, 부가세 계산기, 연차 계산기, 중개수수료 계산기",
+            title=f"{cfg['site_name']} — 가입 없이 바로 쓰는 무료 서식 52종 · 도장 · 계산기 6종",
+            description="바로서식에서 회원가입 없이 52종 무료 A4 표준 서식(인사·퇴사, 계약·노무, 거래·경영, 금전·부동산, 일상·법률·민원), 온라인 투명 도장·손가락 서명, 6종 실무 계산기를 브라우저에서 무료로 이용하고 PDF로 저장하세요.",
+            keywords="바로서식, 무료 서식 52종, 사직서 양식, 차용증 양식, 표준근로계약서, 견적서 양식, 발주서, 청구서, 임대차계약서, 내용증명서, 무료 온라인 도장 만들기, 부가세 계산기, 연차 계산기, 퇴직금 계산기, 실업급여 계산기, 주휴수당 계산기, 중개수수료 계산기",
             active_slug="",
             body_html=home_body,
             extra_scripts=["/assets/js/home-search.js"],
@@ -161,15 +161,24 @@ def build(cfg):
             ]
         else:
             body_html = build_form_page_body(tool)
-            extra_scripts = [
-                "/assets/js/stamp-engine.js",
-                "/assets/js/stamp-widget.js",
-                "/assets/js/form-platform.js",
-                "/assets/js/forms-core.js",
-                "/assets/js/forms-personal.js",
-                "/assets/js/forms-business.js",
-                "/assets/js/forms-extra.js",
-            ]
+            if tool.get("js_bundle"):
+                extra_scripts = [
+                    "/assets/js/stamp-engine.js",
+                    "/assets/js/stamp-widget.js",
+                    "/assets/js/form-platform.js",
+                    "/assets/js/forms-core.js",
+                    tool["js_bundle"],
+                ]
+            else:
+                extra_scripts = [
+                    "/assets/js/stamp-engine.js",
+                    "/assets/js/stamp-widget.js",
+                    "/assets/js/form-platform.js",
+                    "/assets/js/forms-core.js",
+                    "/assets/js/forms-personal.js",
+                    "/assets/js/forms-business.js",
+                    "/assets/js/forms-extra.js",
+                ]
 
         ld_items = [
             make_webapp_ld(cfg, tool, path),

@@ -534,9 +534,52 @@ TOOLS = [
 ]
 
 from content.pages_extra import EXTRA_TOOLS  # noqa: E402
+from content.forms_new_hr_labor import NEW_HR_LABOR_TOOLS  # noqa: E402
+from content.forms_new_biz_money_legal import NEW_BIZ_MONEY_LEGAL_TOOLS  # noqa: E402
 
-# Keep all 12 forms grouped cleanly before 'stamp'
+_EXISTING_CAT_MAP = {
+    "sajikseo": "hr",
+    "jaejik": "hr",
+    "gyeongryeok": "hr",
+    "simal": "hr",
+    "geunro": "labor",
+    "gyeonjeokseo": "biz",
+    "georae": "biz",
+    "yeongsujeung": "biz",
+    "jichul": "biz",
+    "chayongjeung": "money",
+    "wiimjang": "legal",
+    "habuiseo": "legal",
+}
+
 _STAMP_TOOL = [t for t in TOOLS if t["kind"] == "stamp"]
 _BASE_FORMS = [t for t in TOOLS if t["kind"] == "form"]
-TOOLS = _BASE_FORMS + EXTRA_TOOLS + _STAMP_TOOL
+for _f in _BASE_FORMS + EXTRA_TOOLS:
+    _f.setdefault("category", _EXISTING_CAT_MAP.get(_f["key"], "biz"))
+
+# Exact 52-form ordering across the 5 categories (12 + 12 + 12 + 8 + 8 = 52)
+_ALL_FORMS_BY_KEY = {
+    t["key"]: t
+    for t in (_BASE_FORMS + EXTRA_TOOLS + NEW_HR_LABOR_TOOLS + NEW_BIZ_MONEY_LEGAL_TOOLS)
+}
+
+ORDERED_FORM_KEYS = [
+    # 1. 인사·퇴사 (12종)
+    "sajikseo", "jaejik", "gyeongryeok", "toejik", "hyuga", "hyujik",
+    "bokjik", "insu", "simal", "gyeongwiseo", "sayuseo", "chuljang",
+    # 2. 계약·노무 (12종)
+    "geunro", "alba-geunro", "gyeyak-geunro", "ilyong-geunro", "yeonbong", "geubyeo",
+    "yongyeok", "haechok", "nda", "boan", "mou", "dongeop",
+    # 3. 거래·경영 (12종)
+    "gyeonjeokseo", "georae", "baljuseo", "cheongguseo", "yeongsujeung", "gani-yeongsujeung",
+    "jichul", "pumuiseo", "gianseo", "hoeuilok", "eopmuilji", "ipgeum",
+    # 4. 금전·부동산 (8종)
+    "chayongjeung", "hyeongeum", "jibulgakseo", "imdaecha", "maemae",
+    "imdae-tongji", "imdaeryo-yeongsujeung", "mulpoom-maemae",
+    # 5. 일상·법률·민원 (8종)
+    "wiimjang", "habuiseo", "gyotong-habuiseo", "gakseo", "sasil",
+    "naeyong", "tanwonseo", "donguiseo",
+]
+
+TOOLS = [_ALL_FORMS_BY_KEY[k] for k in ORDERED_FORM_KEYS] + _STAMP_TOOL
 TOOL_MAP = {t["key"]: t for t in TOOLS}

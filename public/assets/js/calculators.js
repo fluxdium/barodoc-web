@@ -486,9 +486,196 @@
     render();
   }
 
+  /* ========================================================================
+     4. 퇴직금 계산기 (/calc/severance/)
+     ======================================================================== */
+  function initSeveranceCalculator() {
+    const root = document.getElementById('sevCalcApp');
+    if (!root) return;
+
+    const elJoin = document.getElementById('sevJoinDate');
+    const elLeave = document.getElementById('sevLeaveDate');
+    const elPay3m = document.getElementById('sevPay3m');
+    const elBonus = document.getElementById('sevBonusYear');
+    const elLeavePay = document.getElementById('sevAnnualPay');
+    const elHeroVal = document.getElementById('sevHeroVal');
+    const elHeroSub = document.getElementById('sevHeroSub');
+    const elDaysVal = document.getElementById('sevDaysVal');
+    const elAvgWage = document.getElementById('sevAvgWageVal');
+    const elNetNote = document.getElementById('sevRuleNote');
+
+    if (elLeave && !elLeave.value) elLeave.value = U.todayISO();
+    if (elJoin && !elJoin.value) {
+      const d = new Date();
+      d.setFullYear(d.getFullYear() - 3);
+      elJoin.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function render() {
+      const join = new Date((elJoin.value || '') + 'T00:00:00');
+      const leave = new Date((elLeave.value || '') + 'T00:00:00');
+      if (isNaN(join.getTime()) || isNaN(leave.getTime()) || leave <= join) {
+        if (elHeroVal) elHeroVal.textContent = '날짜를 확인해 주세요';
+        return;
+      }
+      const totalDays = Math.round((leave - join) / 86400000);
+      // 퇴직 전 3개월 일수 계산
+      const threeMonthsAgo = new Date(leave);
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+      const days3m = Math.max(89, Math.min(92, Math.round((leave - threeMonthsAgo) / 86400000)));
+
+      const pay3m = Math.max(0, U.parseNumber(elPay3m.value));
+      const bonus3m = Math.round(Math.max(0, U.parseNumber(elBonus.value)) * (3 / 12));
+      const annual3m = Math.round(Math.max(0, U.parseNumber(elLeavePay.value)) * (3 / 12));
+      const total3m = pay3m + bonus3m + annual3m;
+      const avgDaily = total3m / days3m;
+      const severance = totalDays >= 365 ? Math.round(avgDaily * 30 * (totalDays / 365)) : 0;
+
+      if (elDaysVal) elDaysVal.textContent = `${U.formatNumber(totalDays)}일 (${U.calcTenure(elJoin.value, elLeave.value) || '1년 미만'})`;
+      if (elAvgWage) elAvgWage.textContent = `${U.formatNumber(Math.round(avgDaily))}원 / 일`;
+      if (totalDays < 365) {
+        if (elHeroVal) elHeroVal.textContent = '지급 대상 아님 (1년 미만)';
+        if (elHeroSub) elHeroSub.textContent = '법정 퇴직금은 계속근로기간 1년(365일) 이상 + 주 15시간 이상 근로 시 발생합니다.';
+      } else {
+        if (elHeroVal) elHeroVal.textContent = `${U.formatNumber(severance)}원`;
+        if (elHeroSub) elHeroSub.textContent = `${U.formatKoreanCurrency(severance)} (세전 예상 · 퇴직소득세 별도)`;
+      }
+      if (elNetNote) {
+        elNetNote.innerHTML = `<div>• 퇴직 전 3개월 기준일수: <strong>${days3m}일</strong> / 3개월 산입 임금 총액: <strong>${U.formatNumber(total3m)}원</strong></div><div>• 근로자퇴직급여보장법상 퇴직금은 퇴직일로부터 <strong>14일 이내</strong> 지급이 원칙입니다. (IRP 계좌 이전 필수)</div>`;
+      }
+    }
+
+    [elJoin, elLeave, elPay3m, elBonus, elLeavePay].forEach((el) => {
+      if (el) el.addEventListener('input', render);
+      if (el) el.addEventListener('change', render);
+    });
+    render();
+  }
+
+  /* ========================================================================
+     5. 실업급여 계산기 (/calc/unemployment/) — 2026 기준
+     ======================================================================== */
+  function initUnemploymentCalculator() {
+    const root = document.getElementById('unempCalcApp');
+    if (!root) return;
+
+    const elAgeGroup = document.getElementById('ueAgeGroup'); // under50 | over50
+    const elPeriod = document.getElementById('ueInsPeriod'); // 0(<1y), 1(1~3y), 3(3~5y), 5(5~10y), 10(10y+)
+    const elMonthly = document.getElementById('ueMonthlyWage');
+    const elHours = document.getElementById('ueDailyHours');
+    const elHeroVal = document.getElementById('ueHeroVal');
+    const elHeroSub = document.getElementById('ueHeroSub');
+    const elDailyVal = document.getElementById('ueDailyVal');
+    const elDaysVal = document.getElementById('ueDaysVal');
+    const elMonthVal = document.getElementById('ueMonthVal');
+    const elNote = document.getElementById('ueRuleNote');
+
+    const DAYS_TABLE = {
+      under50: { '0': 120, '1': 150, '3': 180, '5': 210, '10': 240 },
+      over50: { '0': 120, '1': 180, '3': 210, '5': 240, '10': 270 },
+    };
+
+    function render() {
+      const age = elAgeGroup.value || 'under50';
+      const period = elPeriod.value || '1';
+      const monthly = Math.max(0, U.parseNumber(elMonthly.value));
+      const dailyHours = Math.max(1, Math.min(8, U.parseNumber(elHours.value) || 8));
+
+      const benefitDays = (DAYS_TABLE[age] && DAYS_TABLE[age][period]) || 120;
+      const avgDaily = (monthly * 3) / 90;
+      const raw60 = avgDaily * 0.6;
+
+      // 2026 기준: 상한액 66,000원, 하한액 = 2026 최저시급(10,320) * 0.8 * 소정근로시간 (8h = 66,048원 -> 상한과 하한 역전 시 법정 하한 66,048 또는 66,000 적용)
+      const cap = 66000;
+      const floor = Math.round(10320 * 0.8 * dailyHours);
+      const effectiveDaily = Math.round(Math.max(Math.min(raw60, cap), Math.min(floor, Math.max(cap, floor))));
+      const total = effectiveDaily * benefitDays;
+      const per30 = effectiveDaily * 30;
+
+      if (elHeroVal) elHeroVal.textContent = `${U.formatNumber(total)}원`;
+      if (elHeroSub) elHeroSub.textContent = `${U.formatKoreanCurrency(total)} (총 ${benefitDays}일 수급 시 예상 합계)`;
+      if (elDailyVal) elDailyVal.textContent = `${U.formatNumber(effectiveDaily)}원 / 일`;
+      if (elDaysVal) elDaysVal.textContent = `${benefitDays}일 (약 ${Math.round((benefitDays / 30) * 10) / 10}개월)`;
+      if (elMonthVal) elMonthVal.textContent = `약 ${U.formatNumber(per30)}원`;
+      if (elNote) {
+        elNote.innerHTML = `<div>• 1일 평균임금의 60%: ${U.formatNumber(Math.round(raw60))}원 (상한 66,000원 / ${dailyHours}시간 하한 ${U.formatNumber(floor)}원 적용)</div><div>• 비자발적 이직(권고사직·계약만료 등) + 이직 전 18개월간 피보험단위기간 <strong>180일 이상</strong> 충족 시 수급 가능합니다.</div>`;
+      }
+    }
+
+    [elAgeGroup, elPeriod, elMonthly, elHours].forEach((el) => {
+      if (el) el.addEventListener('input', render);
+      if (el) el.addEventListener('change', render);
+    });
+    render();
+  }
+
+  /* ========================================================================
+     6. 주휴수당 계산기 (/calc/weekly-holiday/) — 2026 최저시급 10,320원 기준
+     ======================================================================== */
+  function initWeeklyHolidayCalculator() {
+    const root = document.getElementById('whCalcApp');
+    if (!root) return;
+
+    const elHourly = document.getElementById('whHourly');
+    const elHours = document.getElementById('whWeeklyHours');
+    const elHeroVal = document.getElementById('whHeroVal');
+    const elHeroSub = document.getElementById('whHeroSub');
+    const elWeekBase = document.getElementById('whWeekBase');
+    const elRealHourly = document.getElementById('whRealHourly');
+    const elMonthTotal = document.getElementById('whMonthTotal');
+    const elRuleNote = document.getElementById('whRuleNote');
+
+    function render() {
+      const hourly = Math.max(0, U.parseNumber(elHourly.value));
+      const weeklyHours = Math.max(0, Math.min(52, U.parseNumber(elHours.value)));
+      const eligible = weeklyHours >= 15;
+      const holidayHours = eligible ? (Math.min(40, weeklyHours) / 40) * 8 : 0;
+      const weeklyHolidayPay = Math.round(holidayHours * hourly);
+      const weeklyBase = Math.round(weeklyHours * hourly);
+      const weeklyTotal = weeklyBase + weeklyHolidayPay;
+      const realHourly = weeklyHours > 0 ? Math.round(weeklyTotal / weeklyHours) : 0;
+      const monthlyEst = Math.round(weeklyTotal * 4.345);
+
+      if (elHeroVal) {
+        elHeroVal.textContent = eligible ? `주 ${U.formatNumber(weeklyHolidayPay)}원` : '0원 (주 15시간 미만)';
+      }
+      if (elHeroSub) {
+        elHeroSub.textContent = eligible
+          ? `주휴시간 ${Math.round(holidayHours * 100) / 100}시간 × 시급 ${U.formatNumber(hourly)}원 · 주급 합계 ${U.formatNumber(weeklyTotal)}원`
+          : '주 소정근로시간이 15시간 미만이면 법정 주휴수당 지급 대상이 아닙니다.';
+      }
+      if (elWeekBase) elWeekBase.textContent = `${U.formatNumber(weeklyTotal)}원`;
+      if (elRealHourly) elRealHourly.textContent = `${U.formatNumber(realHourly)}원 / 시간`;
+      if (elMonthTotal) elMonthTotal.textContent = `약 ${U.formatNumber(monthlyEst)}원`;
+
+      if (elRuleNote) {
+        const minWarn =
+          hourly < 10320
+            ? `<div style="color:#b91c1c;font-weight:700;">⚠ 입력한 시급(${U.formatNumber(hourly)}원)이 2026년 법정 최저시급(10,320원) 미만입니다!</div>`
+            : `<div>✓ 2026년 최저시급(10,320원) 기준 충족 (최저시급 기준 주휴 포함 실질 시급 12,384원)</div>`;
+        elRuleNote.innerHTML = `${minWarn}<div>• 계산식: (1주 소정근로시간 ÷ 40) × 8 × 시급 (최대 주 40시간 기준 8시간 한도, 소정근로일 개근 조건)</div>`;
+      }
+    }
+
+    root.querySelectorAll('[data-wh-preset]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        elHours.value = btn.getAttribute('data-wh-preset');
+        render();
+      });
+    });
+
+    [elHourly, elHours].forEach((el) => {
+      if (el) el.addEventListener('input', render);
+    });
+    render();
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     initVatCalculator();
     initAnnualLeaveCalculator();
     initBrokerageCalculator();
+    initSeveranceCalculator();
+    initUnemploymentCalculator();
+    initWeeklyHolidayCalculator();
   });
 })(window);

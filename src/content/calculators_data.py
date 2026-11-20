@@ -440,6 +440,339 @@ CALCULATORS = [
             ("가족이 대신 부동산 계약을 진행하거나 부모님께 주택 자금을 빌릴 때 필요한 서류가 있나요?", "대리 계약 시에는 소유자 인감 날인 위임장과 인감증명서가 필요하며, 가족 간 주택 자금 차용 시에는 증여세 방어를 위해 송금 전 차용증을 작성해야 합니다. 바로서식의 무료 위임장·차용증 작성기를 활용해 보세요."),
         ],
     },
+    {
+        "key": "severance",
+        "slug": "severance",
+        "path": "/calc/severance/",
+        "short_name": "퇴직금 계산기",
+        "icon": "퇴",
+        "tag": "평균임금·IRP 기준",
+        "title": "퇴직금 계산기 (입사일·퇴사일·3개월 급여 자동 계산 · 2026 기준)",
+        "h1": "무료 퇴직금 계산기",
+        "subtitle": "입사일·퇴사일과 퇴직 전 3개월 급여, 연간 상여금·연차수당을 입력하면 법정 예상 퇴직금과 1일 평균임금을 즉시 계산합니다.",
+        "description": "2026년 근로자퇴직급여보장법 기준 무료 퇴직금 계산기입니다. 입사일·퇴직일 재직일수, 퇴직 전 3개월 급여·상여금·연차수당을 반영해 1일 평균임금과 세전 예상 퇴직금을 1초 만에 계산하세요.",
+        "keywords": "퇴직금 계산기, 퇴직금 계산 방법, 퇴직금 산정, 평균임금 계산, 퇴직금 IRP, 무료 퇴직금 계산기",
+        "card_desc": "재직일수·3개월 급여·상여금·연차수당 반영 예상 퇴직금",
+        "card_features": ["재직일수·3개월 평균임금 자동 산출", "상여금·미사용 연차수당 3/12 반영", "사직서·퇴직증명서 바로 연동"],
+        "related_forms": [
+            ("/sajikseo/", "무료 사직서 양식 작성 →"),
+            ("/toejik/", "무료 퇴직증명서 양식 작성 →"),
+            ("/gyeongryeok/", "무료 경력증명서 양식 작성 →"),
+        ],
+        "app_html": """
+        <div class="calc-grid" id="sevCalcApp">
+          <div class="calc-card">
+            <div class="field-row">
+              <div class="field">
+                <label for="sevJoinDate">입사일</label>
+                <input type="date" id="sevJoinDate">
+              </div>
+              <div class="field">
+                <label for="sevLeaveDate">퇴직일 (마지막 근무 다음날)</label>
+                <input type="date" id="sevLeaveDate">
+              </div>
+            </div>
+            <div class="field">
+              <label for="sevPay3m">퇴직 전 3개월 급여 총액 (세전, 원)</label>
+              <input type="number" id="sevPay3m" min="0" step="10000" value="9000000" placeholder="예: 월 300만원 × 3개월 = 9000000">
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="sevBonusYear">연간 상여금 총액 (원)</label>
+                <input type="number" id="sevBonusYear" min="0" step="10000" value="0">
+              </div>
+              <div class="field">
+                <label for="sevAnnualPay">연간 연차수당 (원)</label>
+                <input type="number" id="sevAnnualPay" min="0" step="10000" value="0">
+              </div>
+            </div>
+            <div class="guide-callout" style="margin:12px 0 0;font-size:13px;" id="sevRuleNote"></div>
+          </div>
+
+          <div class="calc-card">
+            <div class="calc-result-hero">
+              <div class="calc-result-label">세전 예상 법정 퇴직금</div>
+              <div class="calc-result-main" id="sevHeroVal">9,000,000원</div>
+              <div class="calc-result-sub" id="sevHeroSub">근로자퇴직급여보장법 기준</div>
+            </div>
+            <div class="calc-breakdown-grid" style="grid-template-columns:repeat(2,1fr);">
+              <div class="calc-stat-box">
+                <div class="lbl">총 계속근로일수</div>
+                <div class="val" id="sevDaysVal">1,095일</div>
+                <div class="sub">365일 이상 지급 대상</div>
+              </div>
+              <div class="calc-stat-box">
+                <div class="lbl">1일 평균임금</div>
+                <div class="val" id="sevAvgWageVal">97,826원</div>
+                <div class="sub">3개월 총임금 ÷ 3개월 일수</div>
+              </div>
+            </div>
+            <div class="calc-cta-box">
+              <div>
+                <strong>퇴사 서류와 실업급여도 함께 준비하세요</strong>
+                <span>사직서·퇴직증명서 작성과 실업급여 모의계산을 바로 이어갈 수 있습니다.</span>
+              </div>
+              <div class="calc-cta-links">
+                <a href="/sajikseo/" class="btn btn-primary btn-sm">사직서 작성 →</a>
+                <a href="/toejik/" class="btn btn-outline btn-sm">퇴직증명서 →</a>
+                <a href="/calc/unemployment/" class="btn btn-outline btn-sm">실업급여 계산 →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        """,
+        "guide_html": """
+<h2>법정 퇴직금 계산 공식과 지급 기준 완벽 정리</h2>
+<p>「근로자퇴직급여 보장법」에 따라 <strong>계속근로기간이 1년(365일) 이상</strong>이고 <strong>4주 평균 1주 소정근로시간이 15시간 이상</strong>인 근로자는 정규직·계약직·아르바이트 여부와 관계없이 퇴직금을 받을 수 있습니다.</p>
+
+<h3>1. 퇴직금 공식 및 산입 항목</h3>
+<ul>
+  <li><strong>기본 공식:</strong> <code>1일 평균임금 × 30일 × (총 계속근로일수 ÷ 365)</code></li>
+  <li><strong>1일 평균임금:</strong> 퇴직 전 3개월간 지급받은 임금 총액(세전)에 연간 상여금의 3/12 및 직전 연도 미사용 연차수당의 3/12을 더해 3개월 총 일수(89~92일)로 나눈 금액입니다.</li>
+  <li><strong>통상임금 하한 보호:</strong> 만약 퇴직 직전 무급휴가나 병가 등으로 1일 평균임금이 1일 통상임금보다 낮아진 경우, 근로기준법에 따라 <strong>1일 통상임금</strong>을 기준으로 퇴직금을 산정합니다.</li>
+</ul>
+
+<h3>2. 퇴직금 지급 기한과 IRP 계좌 이전</h3>
+<p>사용자는 퇴직일로부터 <strong>14일 이내</strong>에 퇴직금을 지급해야 합니다. 2022년 4월 이후 퇴직금은 원칙적으로 근로자 본인의 <strong>개인형 퇴직연금(IRP) 계좌</strong>로 이전 지급되며(만 55세 이상, 퇴직금 300만 원 이하 등 예외 있음), 지연 시 연 20%의 지연이자를 청구할 수 있습니다.</p>
+""",
+        "faqs": [
+            ("5인 미만 사업장이나 아르바이트생도 퇴직금을 받을 수 있나요?", "네, 퇴직금은 사업장 규모와 무관하게 1인 이상 모든 사업장에 적용됩니다. 주 15시간 이상 근무하며 1년(365일) 이상 계속 근로했다면 알바생도 법정 퇴직금을 받을 수 있습니다."),
+            ("퇴직금에서 세금은 얼마나 공제되나요?", "퇴직소득세는 근속연수공제와 환산급여공제가 크게 적용되어 일반 근로소득세보다 훨씬 낮으며, IRP 계좌로 수령할 경우 연금 수령 전까지 퇴직소득세 원천징수가 이연됩니다."),
+            ("퇴직 전 마지막 달에 결근이나 병가가 있으면 퇴직금이 줄어드나요?", "평균임금이 통상임금보다 낮아지면 근로기준법 제2조에 따라 통상임금이 평균임금으로 적용되므로 부당하게 줄어드는 것을 방지합니다."),
+            ("퇴사 후 14일이 지났는데 퇴직금을 안 주면 어떻게 하나요?", "당사자 간 지급기일 연장 합의가 없다면 임금체불에 해당하므로 관할 고용노동부에 진정을 제기할 수 있습니다."),
+            ("연차수당은 어떤 것이 퇴직금 평균임금에 들어가나요?", "퇴직으로 인해 비로소 발생한 미사용 연차수당은 제외되며, 퇴직 전전년도 출근율로 발생해 퇴직 전 1년간 지급받은 연차수당의 3/12이 평균임금에 산입됩니다."),
+        ],
+    },
+    {
+        "key": "unemployment",
+        "slug": "unemployment",
+        "path": "/calc/unemployment/",
+        "short_name": "실업급여 계산기",
+        "icon": "실",
+        "tag": "2026 상·하한액",
+        "title": "실업급여 계산기 (2026 구직급여 1일 수급액 · 총 수급일수 자동계산)",
+        "h1": "무료 실업급여(구직급여) 계산기",
+        "subtitle": "퇴직 시 연령, 고용보험 가입기간, 월 평균 급여를 입력하면 2026년 기준 1일 구직급여액, 소정급여일수(120~270일), 예상 총 수급액을 바로 계산합니다.",
+        "description": "2026년 고용보험법 기준 무료 실업급여 계산기입니다. 만 50세 미만·이상·장애인 기준 소정급여일수(120~270일)와 1일 상·하한액, 월 예상 수령액, 총 수급액을 1초 만에 확인하세요.",
+        "keywords": "실업급여 계산기, 2026 실업급여, 구직급여 계산기, 실업급여 조건, 실업급여 금액, 권고사직 실업급여",
+        "card_desc": "2026 기준 1일 수급액·소정급여일수·총 예상 수령액",
+        "card_features": ["연령·가입기간별 120~270일 자동 산출", "2026 상한액·최저임금 하한액 자동 적용", "사직서·퇴직증명서 바로 연동"],
+        "related_forms": [
+            ("/sajikseo/", "무료 사직서 양식 작성 →"),
+            ("/toejik/", "무료 퇴직증명서 양식 작성 →"),
+            ("/calc/severance/", "무료 퇴직금 계산기 →"),
+        ],
+        "app_html": """
+        <div class="calc-grid" id="unempCalcApp">
+          <div class="calc-card">
+            <div class="field-row">
+              <div class="field">
+                <label for="ueAgeGroup">퇴사 당시 연령 (만 나이)</label>
+                <select id="ueAgeGroup">
+                  <option value="under50" selected>만 50세 미만</option>
+                  <option value="over50">만 50세 이상 또는 장애인</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="ueInsPeriod">고용보험 총 가입기간</label>
+                <select id="ueInsPeriod">
+                  <option value="0">1년 미만</option>
+                  <option value="1" selected>1년 이상 ~ 3년 미만</option>
+                  <option value="3">3년 이상 ~ 5년 미만</option>
+                  <option value="5">5년 이상 ~ 10년 미만</option>
+                  <option value="10">10년 이상</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="ueMonthlyWage">퇴직 전 3개월 월평균 급여 (세전, 원)</label>
+                <input type="number" id="ueMonthlyWage" min="0" step="50000" value="3200000">
+              </div>
+              <div class="field">
+                <label for="ueDailyHours">1일 소정근로시간</label>
+                <select id="ueDailyHours">
+                  <option value="8" selected>8시간 (주 40시간 풀타임)</option>
+                  <option value="7">7시간</option>
+                  <option value="6">6시간</option>
+                  <option value="5">5시간</option>
+                  <option value="4">4시간 이하 (단시간)</option>
+                </select>
+              </div>
+            </div>
+            <div class="guide-callout" style="margin:12px 0 0;font-size:13px;" id="ueRuleNote"></div>
+          </div>
+
+          <div class="calc-card">
+            <div class="calc-result-hero">
+              <div class="calc-result-label">예상 총 실업급여 수급액</div>
+              <div class="calc-result-main" id="ueHeroVal">9,907,200원</div>
+              <div class="calc-result-sub" id="ueHeroSub">고용보험 구직급여 기준</div>
+            </div>
+            <div class="calc-breakdown-grid">
+              <div class="calc-stat-box">
+                <div class="lbl">1일 구직급여액</div>
+                <div class="val" id="ueDailyVal">66,048원</div>
+                <div class="sub">2026 상·하한액 적용</div>
+              </div>
+              <div class="calc-stat-box">
+                <div class="lbl">소정급여일수</div>
+                <div class="val" id="ueDaysVal">150일</div>
+                <div class="sub">연령·가입기간 기준</div>
+              </div>
+              <div class="calc-stat-box">
+                <div class="lbl">월 예상 수령액 (30일)</div>
+                <div class="val" id="ueMonthVal">약 1,981,440원</div>
+                <div class="sub">비과세 수령</div>
+              </div>
+            </div>
+            <div class="calc-cta-box">
+              <div>
+                <strong>권고사직·계약만료 시 사직서 사유 기재에 주의하세요</strong>
+                <span>사직서에 실제 비자발적 퇴사 사유를 명확히 적어야 수급 불이익이 없습니다.</span>
+              </div>
+              <div class="calc-cta-links">
+                <a href="/sajikseo/" class="btn btn-primary btn-sm">사직서 작성 →</a>
+                <a href="/guide/resignation-notice-period/" class="btn btn-outline btn-sm">실업급여 가이드 →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        """,
+        "guide_html": """
+<h2>2026년 실업급여(구직급여) 수급 조건 및 계산 기준</h2>
+<p>실업급여는 고용보험에 가입된 근로자가 비자발적 사유로 실직한 뒤 재취업 활동을 하는 기간에 소정의 급여를 지급하는 제도입니다.</p>
+
+<h3>1. 실업급여 수급 핵심 요건 3가지</h3>
+<ol>
+  <li><strong>피보험단위기간 180일 이상:</strong> 이직일 이전 18개월(초단시간근로자는 24개월) 동안 유급 근로일수(주휴일 포함)가 통산 180일 이상이어야 합니다.</li>
+  <li><strong>비자발적 이직 사유:</strong> 권고사직, 계약기간 만료, 정년퇴직, 폐업·도산, 또는 임금체불·왕복 3시간 이상 통근 곤란 등 고용보험법상 정당한 이직 사유에 해당해야 합니다.</li>
+  <li><strong>적극적 재취업 활동:</strong> 근로 의사와 능력을 가지고 워크넷(고용24) 구직등록 및 실업인정 절차를 이행해야 합니다.</li>
+</ol>
+
+<h3>2. 연령 및 고용보험 가입기간별 소정급여일수</h3>
+<table class="guide-table">
+  <thead><tr><th>구분</th><th>1년 미만</th><th>1~3년</th><th>3~5년</th><th>5~10년</th><th>10년 이상</th></tr></thead>
+  <tbody>
+    <tr><td><strong>만 50세 미만</strong></td><td>120일</td><td>150일</td><td>180일</td><td>210일</td><td>240일</td></tr>
+    <tr><td><strong>만 50세 이상 · 장애인</strong></td><td>120일</td><td>180일</td><td>210일</td><td>240일</td><td>270일</td></tr>
+  </tbody>
+</table>
+""",
+        "faqs": [
+            ("자진 퇴사(일신상의 사유)는 무조건 실업급여를 못 받나요?", "원칙적으로 자발적 이직은 불가하지만, 임금체불(최근 1년 내 2개월 이상), 사업장 이전으로 왕복 3시간 이상 통근 곤란, 질병으로 업무 수행 불가(의사 소견서+사업주 확인서), 직장 내 괴롭힘 등 예외 사유가 입증되면 수급 가능합니다."),
+            ("퇴사 후 언제까지 실업급여를 신청해야 하나요?", "구직급여는 퇴직 다음 날로부터 12개월이 지나면 소정급여일수가 남아 있어도 지급이 종료되므로 퇴사 직후 지체 없이 신청하는 것이 유리합니다."),
+            ("권고사직인데 사직서에 '일신상의 사유'라고 써달라고 합니다.", "절대 '일신상의 사유'로 적지 마시고 사실 그대로 '회사 경영상 사유에 의한 권고사직'으로 작성한 뒤 사본을 보관하세요."),
+            ("이전 직장의 고용보험 가입기간도 합산되나요?", "네, 이전 직장에서 실업급여를 받지 않았고 이직일 전 18개월 이내의 피보험단위기간이라면 이전 직장 일수와 합산하여 180일 요건을 충족할 수 있습니다."),
+            ("실업급여에는 소득세가 부과되나요?", "아니요. 구직급여는 비과세 소득이므로 세금 공제 없이 전액 계좌로 수령합니다."),
+        ],
+    },
+    {
+        "key": "weekly-holiday",
+        "slug": "weekly-holiday",
+        "path": "/calc/weekly-holiday/",
+        "short_name": "주휴수당 계산기",
+        "icon": "주",
+        "tag": "2026 최저시급",
+        "title": "주휴수당 계산기 (2026 최저시급 10,320원 · 알바 주급·월급 자동계산)",
+        "h1": "무료 주휴수당 계산기",
+        "subtitle": "시급과 1주 소정근로시간만 입력하면 2026년 최저시급(10,320원) 기준 주휴수당, 주휴 포함 실질 시급, 예상 주급·월급을 즉시 계산합니다.",
+        "description": "2026년 최저시급 10,320원 기준 무료 주휴수당 계산기입니다. 아르바이트·파트타임·단시간 근로자의 1주 주휴수당, 주휴 포함 시급, 예상 월급을 1초 만에 계산하고 알바 근로계약서·급여명세서로 바로 연결하세요.",
+        "keywords": "주휴수당 계산기, 주휴수당 계산법, 2026 주휴수당, 알바 주휴수당, 주휴수당 포함 시급, 15시간 주휴수당",
+        "card_desc": "주 15시간 기준 주휴수당·실질 시급·예상 월급 계산",
+        "card_features": ["2026 최저시급 10,320원 자동 점검", "주휴 포함 실질 시급(×1.2) 즉시 산출", "알바 근로계약서·급여명세서 연동"],
+        "related_forms": [
+            ("/alba-geunro/", "무료 알바 근로계약서 작성 →"),
+            ("/geunro/", "무료 표준근로계약서 작성 →"),
+            ("/geubyeo/", "무료 급여명세서 작성 →"),
+        ],
+        "app_html": """
+        <div class="calc-grid" id="whCalcApp">
+          <div class="calc-card">
+            <div class="field">
+              <label for="whHourly">약정 시급 (원, 2026 최저시급 10,320원)</label>
+              <input type="number" id="whHourly" min="0" step="10" value="10320">
+            </div>
+            <div class="field">
+              <label for="whWeeklyHours">1주 소정근로시간 (휴게시간 제외, 시간)</label>
+              <input type="number" id="whWeeklyHours" min="1" max="52" step="0.5" value="20">
+            </div>
+            <div class="chip-row" style="margin-top:8px;">
+              <button type="button" class="chip-btn" data-wh-preset="14">주 14시간 (미대상)</button>
+              <button type="button" class="chip-btn" data-wh-preset="15">주 15시간</button>
+              <button type="button" class="chip-btn" data-wh-preset="20">주 20시간</button>
+              <button type="button" class="chip-btn" data-wh-preset="30">주 30시간</button>
+              <button type="button" class="chip-btn" data-wh-preset="40">주 40시간 (풀타임)</button>
+            </div>
+            <div class="guide-callout" style="margin:12px 0 0;font-size:13px;" id="whRuleNote"></div>
+          </div>
+
+          <div class="calc-card">
+            <div class="calc-result-hero">
+              <div class="calc-result-label">1주 예상 법정 주휴수당</div>
+              <div class="calc-result-main" id="whHeroVal">주 41,280원</div>
+              <div class="calc-result-sub" id="whHeroSub">주휴시간 4시간 × 시급 10,320원</div>
+            </div>
+            <div class="calc-breakdown-grid">
+              <div class="calc-stat-box">
+                <div class="lbl">주휴 포함 1주 총 주급</div>
+                <div class="val" id="whWeekBase">247,680원</div>
+                <div class="sub">기본 주급 + 주휴수당</div>
+              </div>
+              <div class="calc-stat-box">
+                <div class="lbl">주휴 포함 실질 시급</div>
+                <div class="val" id="whRealHourly">12,384원 / 시간</div>
+                <div class="sub">약정 시급 × 1.2배</div>
+              </div>
+              <div class="calc-stat-box">
+                <div class="lbl">월 예상 총 급여 (세전)</div>
+                <div class="val" id="whMonthTotal">약 1,076,170원</div>
+                <div class="sub">주급 × 4.345주 기준</div>
+              </div>
+            </div>
+            <div class="calc-cta-box">
+              <div>
+                <strong>계산한 시급과 주휴수당을 계약서에 바로 반영하세요</strong>
+                <span>단시간(알바) 근로계약서와 급여명세서를 브라우저에서 바로 작성할 수 있습니다.</span>
+              </div>
+              <div class="calc-cta-links">
+                <a href="/alba-geunro/" class="btn btn-primary btn-sm">알바 근로계약서 →</a>
+                <a href="/geubyeo/" class="btn btn-outline btn-sm">급여명세서 →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        """,
+        "guide_html": """
+<h2>2026년 주휴수당 발생 조건과 계산 공식 완벽 정리</h2>
+<p>주휴수당은 「근로기준법」 제55조에 따라 1주 동안 소정근로일을 개근한 근로자에게 유급 주휴일 1일분의 임금을 추가로 지급하는 법정 수당입니다. <strong>5인 미만 사업장 및 아르바이트·단시간 근로자에게도 동일하게 적용</strong>됩니다.</p>
+
+<h3>1. 주휴수당 지급 필수 조건 2가지</h3>
+<ul>
+  <li><strong>1주 소정근로시간 15시간 이상:</strong> 근로계약서에 약정한 1주 근로시간(휴게시간 제외)이 15시간 이상이어야 합니다.</li>
+  <li><strong>소정근로일 개근:</strong> 약속된 출근일에 결근하지 않고 모두 출근해야 합니다. (지각·조퇴는 결근이 아니므로 주휴수당이 발생합니다.)</li>
+</ul>
+
+<h3>2. 주휴수당 공식 및 2026년 최저시급 예시</h3>
+<p><code>주휴수당 = (1주 소정근로시간 ÷ 40) × 8 × 시급</code> (최대 주 40시간 기준 8시간 한도)</p>
+<table class="guide-table">
+  <thead><tr><th>1주 근로시간</th><th>주휴시간</th><th>2026 최저시급(10,320원) 주휴수당</th><th>주휴 포함 주급</th></tr></thead>
+  <tbody>
+    <tr><td>주 15시간</td><td>3시간</td><td>30,960원</td><td>185,760원</td></tr>
+    <tr><td>주 20시간</td><td>4시간</td><td>41,280원</td><td>247,680원</td></tr>
+    <tr><td>주 30시간</td><td>6시간</td><td>61,920원</td><td>371,520원</td></tr>
+    <tr><td>주 40시간</td><td>8시간</td><td>82,560원</td><td>495,360원</td></tr>
+  </tbody>
+</table>
+""",
+        "faqs": [
+            ("5인 미만 작은 카페나 편의점 알바도 주휴수당을 받나요?", "네, 주휴수당은 근로기준법상 상시근로자 수와 무관하게 1인 이상 모든 사업장에 의무 적용됩니다."),
+            ("지각이나 조퇴를 한 번 하면 그 주 주휴수당이 사라지나요?", "아니요. 지각·조퇴는 출근 자체를 한 것이므로 결근이 아니며, 소정근로일을 개근한 것으로 보아 주휴수당이 정상 발생합니다."),
+            ("퇴사하는 마지막 주에도 주휴수당을 받을 수 있나요?", "대법원 및 고용노동부 변경 행정해석에 따라 1주간 소정근로일을 개근하고 그 주를 마친 뒤 퇴직하는 경우(일주일 근로관계 유지) 마지막 주 주휴수당도 지급 대상입니다."),
+            ("연장근로를 해서 15시간을 넘긴 경우에도 주휴수당이 나오나요?", "주휴수당 기준은 실제 연장근로시간이 아니라 근로계약상 약정된 '소정근로시간' 기준입니다. 다만 상습적으로 주 15시간 이상 근무하는 경우 실질 소정근로시간으로 인정받을 수 있습니다."),
+            ("주 40시간을 넘겨 45시간 일하면 주휴시간도 9시간이 되나요?", "아니요. 주휴시간은 법정 근로시간 한도인 주 40시간 기준 최대 8시간까지만 인정되며, 40시간 초과분은 연장근로수당(5인 이상 사업장 1.5배)으로 정산됩니다."),
+        ],
+    },
 ]
 
 CALC_MAP = {c["key"]: c for c in CALCULATORS}

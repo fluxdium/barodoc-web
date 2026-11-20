@@ -63,16 +63,21 @@ def build_base_html(
     ]
 
     mobile_links = [
-        f'<a class="mobile-drawer-link{forms_active}" href="/#tools">무료 서식 12종</a>',
+        f'<a class="mobile-drawer-link{forms_active}" href="/#tools">무료 서식 52종</a>',
         f'<a class="mobile-drawer-link{stamp_active}" href="/stamp/">도장 만들기</a>',
-        f'<a class="mobile-drawer-link{calc_active}" href="/#calculators">실무 계산기 3종</a>',
+        f'<a class="mobile-drawer-link{calc_active}" href="/#calculators">실무 계산기 6종</a>',
         f'<a class="mobile-drawer-link{guide_active}" href="/guide/">실무 가이드</a>',
     ]
 
+    popular_footer_keys = {
+        "sajikseo", "chayongjeung", "wiimjang", "jaejik", "gyeonjeokseo", "geunro",
+        "georae", "baljuseo", "cheongguseo", "imdaecha", "naeyong", "habuiseo", "stamp",
+    }
     footer_tool_links = "".join(
         f'<li><a href="/{t["slug"]}/">{t["short_name"] if t["kind"] == "stamp" else t["short_name"] + " 양식"}</a></li>'
         for t in TOOLS
-    ) + "".join(
+        if t["key"] in popular_footer_keys
+    ) + '<li><a href="/#tools"><strong>전체 52종 무료 서식 →</strong></a></li>' + "".join(
         f'<li><a href="{c["path"]}">{c["short_name"]}</a></li>'
         for c in CALCULATORS
     )
@@ -197,11 +202,14 @@ def build_base_html(
 
 
 def build_editorial_section(tool):
+    cur_cat = tool.get("category", "")
+    same_cat = [t for t in TOOLS if t["kind"] == "form" and t["key"] != tool["key"] and t.get("category") == cur_cat]
+    other_pop = [t for t in TOOLS if t["kind"] == "form" and t["key"] != tool["key"] and t.get("category") != cur_cat]
+    related_list = (same_cat[:10] + other_pop[: max(0, 11 - len(same_cat[:10]))])
     related_links = "".join(
-        f'<li><a href="/{t["slug"]}/"><span>{t["short_name"] if t["kind"] == "stamp" else t["short_name"] + " 양식"}</span><span>→</span></a></li>'
-        for t in TOOLS
-        if t["key"] != tool["key"]
-    )
+        f'<li><a href="/{t["slug"]}/"><span>{t["short_name"]} 양식</span><span>→</span></a></li>'
+        for t in related_list
+    ) + '<li><a href="/#tools"><span><strong>전체 52종 서식 보기</strong></span><span>→</span></a></li>'
     faqs_html = "".join(
         f"""
         <details class="faq-item">
@@ -216,42 +224,75 @@ def build_editorial_section(tool):
         """
         <div class="aside-card aside-stamp-cta">
           <h3>● 한글 투명 도장이 필요하신가요?</h3>
-          <p>원형 막도장·회사 사각 직인을 5초 만에 만들어 투명 PNG로 저장하고 모든 서식에 바로 찍을 수 있습니다.</p>
+          <p>원형 막도장·회사 사각 직인을 5초 만에 만들어 투명 PNG로 저장하고 52종 모든 서식에 바로 찍을 수 있습니다.</p>
           <a href="/stamp/" class="btn btn-seal btn-block btn-sm">무료 도장 만들기 →</a>
         </div>
         """
         if tool["kind"] != "stamp"
         else """
         <div class="aside-card aside-stamp-cta">
-          <h3>바로 날인 가능한 7종 서식</h3>
+          <h3>바로 날인 가능한 52종 무료 서식</h3>
           <p>도장을 저장한 뒤 사직서·차용증·견적서 등 원하는 서식을 열면 자동으로 날인됩니다.</p>
           <a href="/sajikseo/?stamp=auto" class="btn btn-navy btn-block btn-sm">사직서에 바로 찍어보기 →</a>
         </div>
         """
     )
 
-    calc_link_map = {
-        "gyeonjeokseo": ("/calc/vat/", "무료 부가세(VAT) 계산기", "공급가액 +10% 계산과 부가세 포함 역산을 1초 만에 확인해 보세요."),
-        "georae": ("/calc/vat/", "무료 부가세(VAT) 계산기", "거래명세서 작성 전 공급가액과 부가세(10%)를 간편하게 계산하세요."),
-        "yeongsujeung": ("/calc/vat/", "무료 부가세(VAT) 계산기", "공급가액과 부가세(10%), 프리랜서 3.3% 세후 금액을 즉시 확인하세요."),
-        "jichul": ("/calc/vat/", "무료 부가세(VAT) 계산기", "카드 전표 총액에서 공급가액과 부가세(10%)를 빠르게 역산하세요."),
-        "sajikseo": ("/calc/annual-leave/", "무료 연차 · 연차수당 계산기", "퇴사 전 남은 연차 일수와 미사용 연차수당 예상액을 미리 확인하세요."),
-        "geunro": ("/calc/annual-leave/", "무료 연차 · 연차수당 계산기", "입사일·회계연도 기준 법정 연차 발생 일수를 자동으로 계산합니다."),
-        "jaejik": ("/calc/annual-leave/", "무료 연차 · 연차수당 계산기", "입사일 기준 근속연차와 미사용 연차수당을 간편하게 확인하세요."),
-        "gyeongryeok": ("/calc/annual-leave/", "무료 연차 · 연차수당 계산기", "퇴사 시 정산받을 미사용 연차 일수와 예상 수당도 함께 확인하세요."),
-        "simal": ("/calc/annual-leave/", "무료 연차 · 연차수당 계산기", "재직기간별 법정 연차 발생 일수를 간편하게 확인하세요."),
-        "wiimjang": ("/calc/brokerage/", "무료 부동산 중개수수료(복비) 계산기", "부동산 대리 계약 시 매매·전세·월세 상한요율과 부가세를 바로 계산하세요."),
-        "chayongjeung": ("/calc/brokerage/", "무료 부동산 중개수수료(복비) 계산기", "주택 매매·전세 자금 계획 시 예상 중개보수(복비)도 함께 확인하세요."),
-        "habuiseo": ("/calc/brokerage/", "무료 부동산 중개수수료(복비) 계산기", "임대차·매매 관련 중개보수 상한요율도 함께 확인해 보세요."),
+    # Multi-calculator contextual links per form / category
+    calc_pairs = {
+        "sajikseo": [
+            ("/calc/severance/", "무료 퇴직금 계산기"),
+            ("/calc/unemployment/", "무료 실업급여 계산기"),
+            ("/calc/annual-leave/", "무료 연차수당 계산기"),
+        ],
+        "toejik": [
+            ("/calc/severance/", "무료 퇴직금 계산기"),
+            ("/calc/unemployment/", "무료 실업급여 계산기"),
+        ],
+        "gyeongryeok": [
+            ("/calc/severance/", "무료 퇴직금 계산기"),
+            ("/calc/annual-leave/", "무료 연차수당 계산기"),
+        ],
+        "insu": [
+            ("/calc/severance/", "무료 퇴직금 계산기"),
+            ("/calc/annual-leave/", "무료 연차수당 계산기"),
+        ],
+        "hyuga": [("/calc/annual-leave/", "무료 연차 · 연차수당 계산기")],
+        "jaejik": [("/calc/annual-leave/", "무료 연차 · 연차수당 계산기")],
+        "hyujik": [("/calc/annual-leave/", "무료 연차 계산기"), ("/calc/unemployment/", "무료 실업급여 계산기")],
+        "bokjik": [("/calc/annual-leave/", "무료 연차 계산기")],
+        "geunro": [("/calc/weekly-holiday/", "무료 주휴수당 계산기"), ("/calc/annual-leave/", "무료 연차 계산기")],
+        "alba-geunro": [("/calc/weekly-holiday/", "무료 주휴수당 계산기"), ("/calc/severance/", "무료 퇴직금 계산기")],
+        "gyeyak-geunro": [("/calc/weekly-holiday/", "무료 주휴수당 계산기"), ("/calc/severance/", "무료 퇴직금 계산기")],
+        "ilyong-geunro": [("/calc/weekly-holiday/", "무료 주휴수당 계산기")],
+        "yeonbong": [("/calc/severance/", "무료 퇴직금 계산기"), ("/calc/annual-leave/", "무료 연차수당 계산기")],
+        "geubyeo": [("/calc/weekly-holiday/", "무료 주휴수당 계산기"), ("/calc/annual-leave/", "무료 연차수당 계산기")],
+        "yongyeok": [("/calc/vat/", "무료 부가세 · 3.3% 계산기")],
+        "haechok": [("/calc/vat/", "무료 부가세 · 3.3% 계산기")],
+        "imdaecha": [("/calc/brokerage/", "무료 부동산 중개수수료(복비) 계산기")],
+        "maemae": [("/calc/brokerage/", "무료 부동산 중개수수료(복비) 계산기")],
+        "imdae-tongji": [("/calc/brokerage/", "무료 부동산 중개수수료(복비) 계산기")],
+        "imdaeryo-yeongsujeung": [("/calc/brokerage/", "무료 부동산 중개수수료(복비) 계산기")],
     }
+    cat_default_calcs = {
+        "hr": [("/calc/annual-leave/", "무료 연차 계산기"), ("/calc/severance/", "무료 퇴직금 계산기")],
+        "labor": [("/calc/weekly-holiday/", "무료 주휴수당 계산기"), ("/calc/severance/", "무료 퇴직금 계산기")],
+        "biz": [("/calc/vat/", "무료 부가세(VAT) 계산기")],
+        "money": [("/calc/brokerage/", "무료 부동산 중개수수료 계산기"), ("/calc/vat/", "무료 부가세 계산기")],
+        "legal": [("/calc/brokerage/", "무료 중개수수료 계산기"), ("/calc/vat/", "무료 부가세 계산기")],
+    }
+    linked_calcs = calc_pairs.get(tool["key"]) or cat_default_calcs.get(cur_cat, [])
     related_calc_card = ""
-    if tool["key"] in calc_link_map:
-        c_href, c_title, c_desc = calc_link_map[tool["key"]]
+    if linked_calcs:
+        calc_btns = "".join(
+            f'<a href="{href}" class="btn {"btn-primary" if i == 0 else "btn-outline"} btn-block btn-sm" style="margin-top:{0 if i == 0 else 6}px;">{label} →</a>'
+            for i, (href, label) in enumerate(linked_calcs)
+        )
         related_calc_card = f"""
         <div class="aside-card" style="background:var(--brand-blue-soft);border-color:#bfdbfe;">
-          <h3>함께 쓰면 좋은 계산기</h3>
-          <p style="margin:0 0 10px;font-size:13.5px;color:var(--text-secondary);">{c_desc}</p>
-          <a href="{c_href}" class="btn btn-primary btn-block btn-sm">{c_title} →</a>
+          <h3>함께 쓰면 좋은 실무 계산기</h3>
+          <p style="margin:0 0 10px;font-size:13.5px;color:var(--text-secondary);">이 서식과 관련된 2026년 최신 법령 기준 금액을 1초 만에 미리 계산해 보세요.</p>
+          {calc_btns}
         </div>
         """
 
@@ -333,6 +374,8 @@ def build_form_page_body(tool):
               <button type="button" class="btn-quick-share" id="shareLinkBtn" data-share-trigger title="입력 내용을 링크 해시(#d=)에 담아 서버 저장 없이 상대방에게 전달합니다">🔗 상대방 입력 요청 링크 복사</button>
             </div>
 
+            <div id="tradeChainBar" class="trade-chain-bar no-print" style="display:none;"></div>
+
             <div class="editor-body">
               <div id="liveValidationBar" class="live-validation-wrap no-print"></div>
               <div id="stampWidgetContainer"></div>
@@ -395,11 +438,12 @@ def build_form_page_body(tool):
 
 
 def build_stamp_page_body(tool):
+    flagship_keys = {"sajikseo", "chayongjeung", "wiimjang", "jaejik", "gyeonjeokseo", "geunro", "georae", "baljuseo", "cheongguseo", "imdaecha", "naeyong", "habuiseo"}
     jump_links = "".join(
         f'<a href="/{t["slug"]}/?stamp=auto">{t["short_name"]}에 바로 찍기 →</a>'
         for t in TOOLS
-        if t["kind"] == "form"
-    )
+        if t["kind"] == "form" and t["key"] in flagship_keys
+    ) + '<a href="/#tools" style="font-weight:800;color:var(--brand-blue);">전체 52종 서식 보기 →</a>'
     return f"""
     <section class="page-hero">
       <div class="container">

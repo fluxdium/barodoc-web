@@ -2946,6 +2946,94 @@ textarea {
   }
 }
 
+/* Homepage 5-Category Section Groups (52 Forms) */
+.home-cat-group {
+  margin-bottom: 22px;
+}
+
+.home-cat-group:last-child {
+  margin-bottom: 6px;
+}
+
+.home-cat-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 9px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.home-cat-group-head h3 {
+  margin: 0;
+  font-size: 15.5px;
+  font-weight: 800;
+  color: var(--brand-navy);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.cat-count-pill {
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--brand-blue-soft);
+  color: var(--brand-blue);
+}
+
+.home-cat-group-head .sub-note {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* Trade Document Chain Carry-Over Bar (견적서 -> 발주서 -> 거래명세서 -> 청구서 -> 영수증) */
+.trade-chain-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 14px;
+  background: #fefce8;
+  border-bottom: 1px solid #fde68a;
+  flex-wrap: wrap;
+}
+
+.trade-chain-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #92400e;
+  white-space: nowrap;
+}
+
+.trade-chain-btns {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.trade-chain-btn {
+  padding: 4px 9px;
+  border-radius: 6px;
+  border: 1px solid #f59e0b;
+  background: #ffffff;
+  color: #92400e;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.13s ease;
+}
+
+.trade-chain-btn:hover {
+  background: #d97706;
+  border-color: #d97706;
+  color: #ffffff;
+}
+
 /* ==========================================================================
    Print Styles (A4 Crisp Vector Output)
    ========================================================================== */
