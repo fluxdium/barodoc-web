@@ -61,6 +61,7 @@ body {
   color: var(--text-primary);
   background: var(--bg-page);
   -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
 }
 
 img {
@@ -422,13 +423,13 @@ textarea {
 
 .tools-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
 }
 
 .utility-row-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -443,6 +444,8 @@ textarea {
   transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
   text-decoration: none;
   min-height: 74px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .action-tile:hover {
@@ -454,16 +457,20 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
   margin-bottom: 4px;
+  min-width: 0;
 }
 
 .action-tile h3 {
   margin: 0;
-  font-size: 16.5px;
+  font-size: 15.5px;
   font-weight: 800;
   letter-spacing: -0.02em;
-  line-height: 1.25;
+  line-height: 1.28;
+  min-width: 0;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 .action-tile .tile-arrow {
@@ -2189,15 +2196,15 @@ textarea {
 @media (max-width: 600px) {
   .tools-grid,
   .utility-row-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
   .action-tile {
-    padding: 12px 12px;
+    padding: 11px 11px;
     min-height: 68px;
   }
   .action-tile h3 {
-    font-size: 14.5px;
+    font-size: 13.5px;
   }
   .action-tile p {
     font-size: 11.5px;
