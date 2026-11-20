@@ -360,6 +360,7 @@
       name: (cfg.text || '도장').trim(),
       label: `${(cfg.text || '도장').trim()} (${shapeLabel})`,
       shape: cfg.shape,
+      cfg,
       dataUrl: url,
       createdAt: new Date().toISOString(),
     };

@@ -144,6 +144,7 @@ def build(cfg):
             keywords="바로서식, 무료 서식, 사직서 양식, 차용증 양식, 위임장 양식, 재직증명서 양식, 견적서 양식, 근로계약서 양식, 거래명세서 양식, 무료 온라인 도장 만들기, 부가세 계산기, 연차 계산기, 중개수수료 계산기",
             active_slug="",
             body_html=home_body,
+            extra_scripts=["/assets/js/home-search.js"],
             json_ld_items=home_ld,
         ),
     )
@@ -163,6 +164,7 @@ def build(cfg):
             extra_scripts = [
                 "/assets/js/stamp-engine.js",
                 "/assets/js/stamp-widget.js",
+                "/assets/js/form-platform.js",
                 "/assets/js/forms-core.js",
                 "/assets/js/forms-personal.js",
                 "/assets/js/forms-business.js",
