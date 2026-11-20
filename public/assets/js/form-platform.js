@@ -1765,6 +1765,28 @@
       // Let layout settle for 1 animation frame
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
+      // Bake exact pixel center for stamps/signatures so html2canvas never miscomputes translate(-50%, -50%)
+      clone.querySelectorAll('.stamp-overlay').forEach((img) => {
+        const anchor = img.parentElement;
+        if (!anchor) return;
+        const aRect = anchor.getBoundingClientRect();
+        const iRect = img.getBoundingClientRect();
+        const w = Math.round(iRect.width);
+        const h = Math.round(iRect.height);
+        if (w > 0 && h > 0) {
+          const left = Math.round((aRect.width - w) / 2);
+          const top = Math.round((aRect.height - h) / 2);
+          img.style.setProperty('transform', 'none', 'important');
+          img.style.setProperty('left', `${left}px`, 'important');
+          img.style.setProperty('top', `${top}px`, 'important');
+          img.style.setProperty('width', `${w}px`, 'important');
+          img.style.setProperty('height', `${h}px`, 'important');
+          img.style.setProperty('max-width', 'none', 'important');
+          img.style.setProperty('max-height', 'none', 'important');
+        }
+        img.style.mixBlendMode = 'normal';
+      });
+
       const rect = clone.getBoundingClientRect();
       const targetW = Math.round(rect.width) || 794;
       const targetH = Math.round(rect.height) || 1123;
