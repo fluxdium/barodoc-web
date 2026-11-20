@@ -191,37 +191,82 @@
   function setupA4Scaler() {
     const stage = document.getElementById('previewStage');
     const scaler = document.getElementById('a4ScaleContainer');
+    const target = document.getElementById('a4PreviewTarget');
     if (!stage || !scaler) return () => {};
 
     const A4_PX_WIDTH = 793.7; // 210mm at 96dpi
+    const A4_PX_HEIGHT = 1122.5; // 297mm at 96dpi
+    const SHEET_GAP_PX = 18;
+    const SCALE_THRESHOLD = 0.005;
 
-    function rescale() {
+    let rafId = null;
+    let lastScale = -1;
+    let lastHeight = -1;
+    let fontsSettled = false;
+
+    scaler.style.width = `${A4_PX_WIDTH}px`;
+
+    function applyScale(force) {
+      rafId = null;
       const style = window.getComputedStyle(stage);
-      const padX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+      const padX = (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0);
       const available = stage.clientWidth - padX;
       if (available <= 0) return;
 
-      const scale = Math.min(1, available / A4_PX_WIDTH);
-      scaler.style.transform = `scale(${scale})`;
+      const nextScale = Math.round(Math.min(1, available / A4_PX_WIDTH) * 10000) / 10000;
+      const sheetCount = target ? Math.max(1, target.querySelectorAll('.a4-sheet').length) : 1;
+      const naturalHeight = sheetCount * A4_PX_HEIGHT + Math.max(0, sheetCount - 1) * SHEET_GAP_PX;
+      const nextHeight = Math.ceil(naturalHeight * nextScale);
 
-      const naturalHeight = scaler.scrollHeight || 1122.5;
-      scaler.style.height = `${naturalHeight * scale}px`;
-      scaler.style.width = `${A4_PX_WIDTH}px`;
+      const scaleChanged = force || lastScale < 0 || Math.abs(nextScale - lastScale) >= SCALE_THRESHOLD;
+      const heightChanged = force || lastHeight < 0 || Math.abs(nextHeight - lastHeight) >= 2;
+
+      if (!scaleChanged && !heightChanged) return;
+
+      if (scaleChanged) {
+        scaler.style.transform = `scale(${nextScale})`;
+        lastScale = nextScale;
+      }
+      if (heightChanged) {
+        scaler.style.height = `${nextHeight}px`;
+        lastHeight = nextHeight;
+      }
+    }
+
+    function scheduleRescale(force) {
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+      rafId = requestAnimationFrame(() => applyScale(Boolean(force)));
     }
 
     if (typeof ResizeObserver !== 'undefined') {
-      const ro = new ResizeObserver(rescale);
+      const ro = new ResizeObserver(() => scheduleRescale(false));
       ro.observe(stage);
     }
-    window.addEventListener('resize', rescale);
+    window.addEventListener('resize', () => scheduleRescale(false));
     window.addEventListener('beforeprint', () => {
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
       scaler.style.transform = 'none';
       scaler.style.height = 'auto';
     });
-    window.addEventListener('afterprint', rescale);
+    window.addEventListener('afterprint', () => scheduleRescale(true));
 
-    rescale();
-    return rescale;
+    // Stabilize layout exactly once after web fonts (e.g. Noto Serif KR) finish loading
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
+        if (!fontsSettled) {
+          fontsSettled = true;
+          scheduleRescale(false);
+        }
+      });
+    }
+
+    scheduleRescale(true);
+    return () => scheduleRescale(false);
   }
 
   function triggerPrint() {
