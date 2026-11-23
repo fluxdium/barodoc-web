@@ -345,11 +345,11 @@ def render_privacy_body(cfg):
             <li><strong>보관 기간 및 삭제 기준:</strong> 접수된 문의 내역과 회신 이메일은 처리 및 답변 완료 후 목적 달성 시 지체 없이 파기하며, 오류 재현·정정 이력 확인이 필요한 경우에 한해 <strong>최대 1년</strong> 이내 보관 후 파기합니다. 이용자가 문의하기 페이지를 통해 이전 문의 내역의 삭제를 요청하면 본인 확인 후 즉시 삭제합니다.</li>
           </ul>
 
-          <h2>5. 쿠키(Cookie) 및 제3자 광고(Google AdSense) 안내</h2>
-          <p>본 사이트는 무료 서비스 운영을 위해 Google LLC가 제공하는 <strong>Google AdSense</strong> 광고 및 방문 통계 도구를 사용할 수 있습니다.</p>
+          <h2>5. 쿠키(Cookie) · 방문 통계(Google Analytics 4) 및 제3자 광고(Google AdSense) 안내</h2>
+          <p>본 사이트는 서비스 품질 개선과 무료 운영을 위해 Google LLC가 제공하는 <strong>Google Analytics 4(GA4)</strong> 방문 통계 도구와 <strong>Google AdSense</strong> 광고를 사용합니다.</p>
           <ul>
-            <li>Google을 포함한 제3자 광고 공급업체는 이용자의 본 사이트 및 다른 웹사이트 이전 방문 기록을 바탕으로 맞춤형 광고를 게재하기 위해 쿠키를 사용할 수 있습니다.</li>
-            <li>Google의 광고 쿠키 사용을 통해 Google 및 파트너는 이용자의 방문 기록을 기반으로 적합한 광고를 표시합니다.</li>
+            <li><strong>방문 통계(GA4):</strong> 방문 페이지 경로, 접속 기기, 체류 시간 등 비식별 통계 정보만 수집하며, <strong>서식 입력 내용·도장·서명 이미지 및 공유 링크의 해시 데이터(<code>#d=...</code>)는 전송 대상에서 원천 제외</strong>(URL 프래그먼트 제거 전송)합니다. 이용자는 <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);text-decoration:underline;">Google Analytics 차단 브라우저 부가기능</a>으로 통계 수집을 거부할 수 있습니다.</li>
+            <li><strong>맞춤형 광고(Google AdSense):</strong> Google을 포함한 제3자 광고 공급업체는 이용자의 본 사이트 및 다른 웹사이트 이전 방문 기록을 바탕으로 맞춤형 광고를 게재하기 위해 쿠키를 사용할 수 있습니다.</li>
             <li>이용자는 <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);text-decoration:underline;">Google 광고 설정(adssettings.google.com)</a>에서 언제든지 맞춤형 광고를 비활성화할 수 있으며, 웹 브라우저의 쿠키 차단 설정을 통해 쿠키 저장을 거부할 수 있습니다.</li>
           </ul>
 

@@ -47,6 +47,22 @@ def build_base_html(
             f'?client={cfg["adsense_client_id"]}" crossorigin="anonymous"></script>'
         )
 
+    ga4_tag = ""
+    ga4_id = (cfg.get("ga4_measurement_id") or "").strip()
+    if ga4_id:
+        ga4_tag = (
+            f'\n  <!-- Google Analytics 4 (hash #d= stripped to prevent share-link leakage) -->\n'
+            f'  <script async src="https://www.googletagmanager.com/gtag/js?id={ga4_id}"></script>\n'
+            f'  <script>\n'
+            f'    window.dataLayer = window.dataLayer || [];\n'
+            f'    function gtag(){{dataLayer.push(arguments);}}\n'
+            f'    gtag(\'js\', new Date());\n'
+            f'    gtag(\'config\', \'{ga4_id}\', {{\n'
+            f'      page_location: window.location.origin + window.location.pathname + window.location.search\n'
+            f'    }});\n'
+            f'  </script>'
+        )
+
     robots_content = "noindex, follow" if noindex else "index, follow, max-image-preview:large, max-snippet:-1"
 
     form_slugs = {t["slug"] for t in TOOLS if t["kind"] == "form"}
@@ -117,7 +133,7 @@ def build_base_html(
   <meta name="twitter:image" content="{og_image}">
 
   {"".join(verification_tags)}
-  {adsense_tag}
+  {adsense_tag}{ga4_tag}
 
   <!-- Fonts: Pretendard (UI) + Korean Formal & Seal Fonts -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
