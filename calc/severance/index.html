@@ -120,12 +120,24 @@
                 <input type="number" id="sevAnnualPay" min="0" step="10000" value="0">
               </div>
             </div>
-            <div class="guide-callout" style="margin:12px 0 0;font-size:13px;" id="sevRuleNote"></div>
+            <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;">
+            <div class="field-row">
+              <div class="field">
+                <label for="sevOrdinaryDaily">1일 통상임금 (선택, 원)</label>
+                <input type="number" id="sevOrdinaryDaily" min="0" step="1000" value="" placeholder="비우면 평균임금만 사용">
+              </div>
+              <div class="field">
+                <label for="sevExcludedDays">3개월 중 제외기간 (선택, 일)</label>
+                <input type="number" id="sevExcludedDays" min="0" max="92" step="1" value="0" placeholder="출산휴가·육아휴직 등">
+              </div>
+            </div>
+            <p class="field-help" style="margin:0 0 10px;">출산전후휴가·육아휴직·업무상 재해 휴업 등 제외기간(근로기준법 시행령 제2조)이 있으면 해당 일수를 입력하고, 3개월 급여에서도 해당 기간 임금을 제외해 입력하세요.</p>
+            <div class="guide-callout" style="margin:0;font-size:13px;" id="sevRuleNote"></div>
           </div>
 
           <div class="calc-card">
             <div class="calc-result-hero">
-              <div class="calc-result-label">세전 예상 법정 퇴직금</div>
+              <div class="calc-result-label">세전 예상 법정 퇴직금 (참고치)</div>
               <div class="calc-result-main" id="sevHeroVal">9,000,000원</div>
               <div class="calc-result-sub" id="sevHeroSub">근로자퇴직급여보장법 기준</div>
             </div>
@@ -136,9 +148,9 @@
                 <div class="sub">365일 이상 지급 대상</div>
               </div>
               <div class="calc-stat-box">
-                <div class="lbl">1일 평균임금</div>
+                <div class="lbl">적용 1일 기준임금</div>
                 <div class="val" id="sevAvgWageVal">97,826원</div>
-                <div class="sub">3개월 총임금 ÷ 3개월 일수</div>
+                <div class="sub" id="sevAvgWageSub">3개월 총임금 ÷ 3개월 일수</div>
               </div>
             </div>
             <div class="calc-cta-box">
@@ -171,11 +183,21 @@
 <ul>
   <li><strong>기본 공식:</strong> <code>1일 평균임금 × 30일 × (총 계속근로일수 ÷ 365)</code></li>
   <li><strong>1일 평균임금:</strong> 퇴직 전 3개월간 지급받은 임금 총액(세전)에 연간 상여금의 3/12 및 직전 연도 미사용 연차수당의 3/12을 더해 3개월 총 일수(89~92일)로 나눈 금액입니다.</li>
-  <li><strong>통상임금 하한 보호:</strong> 만약 퇴직 직전 무급휴가나 병가 등으로 1일 평균임금이 1일 통상임금보다 낮아진 경우, 근로기준법에 따라 <strong>1일 통상임금</strong>을 기준으로 퇴직금을 산정합니다.</li>
+  <li><strong>통상임금 하한 보호 (근로기준법 제2조 제2항):</strong> 퇴직 직전 무급휴가나 병가 등으로 1일 평균임금이 1일 통상임금보다 낮아진 경우, <strong>1일 통상임금</strong>을 기준으로 퇴직금을 산정합니다. 위 계산기에서 '1일 통상임금'을 함께 입력하면 자동으로 비교해 더 높은 금액을 적용합니다.</li>
+  <li><strong>평균임금 산정 제외기간 (근로기준법 시행령 제2조):</strong> 수습기간, 사용자 귀책 휴업, 출산전후휴가, 육아휴직, 업무상 부상·질병 요양 휴업, 쟁의행위 기간 등은 평균임금 산정 기간과 임금 총액에서 모두 제외합니다. 최근 3개월 전체가 제외기간에 해당하는 등 특수 사례는 고용노동부 공식 계산기로 산정하세요.</li>
 </ul>
 
 <h3>2. 퇴직금 지급 기한과 IRP 계좌 이전</h3>
 <p>사용자는 퇴직일로부터 <strong>14일 이내</strong>에 퇴직금을 지급해야 합니다. 2022년 4월 이후 퇴직금은 원칙적으로 근로자 본인의 <strong>개인형 퇴직연금(IRP) 계좌</strong>로 이전 지급되며(만 55세 이상, 퇴직금 300만 원 이하 등 예외 있음), 지연 시 연 20%의 지연이자를 청구할 수 있습니다.</p>
+
+<div class="guide-callout">
+  <strong>공식 법령 및 정부 계산기 출처</strong>
+  <ul style="margin:6px 0 0;padding-left:18px;">
+    <li><a href="https://www.moel.go.kr/retirementpayCal.do" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">고용노동부 — 공식 퇴직금 계산기</a></li>
+    <li><a href="https://www.law.go.kr/법령/근로자퇴직급여보장법" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국가법령정보센터 — 「근로자퇴직급여 보장법」</a></li>
+    <li><a href="https://www.law.go.kr/법령/근로기준법/제2조" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국가법령정보센터 — 「근로기준법」 제2조(평균임금·통상임금)</a></li>
+  </ul>
+</div>
 
 
           <h3>자주 묻는 질문 (FAQ)</h3>
@@ -207,6 +229,15 @@
         </details>
         
           </div>
+          
+    <div class="review-meta-box">
+      <div class="review-meta-head">
+        <strong>콘텐츠 검수 및 출처 기준 안내</strong>
+        <span class="review-meta-date">최종 검토일: 2026-11-23</span>
+      </div>
+      <p>본 페이지의 서식·계산식·실무 안내는 <strong>바로서식 편집·검수팀</strong>이 국가법령정보센터·고용노동부·국세청·최저임금위원회 등 공공기관 공식 고시 원문을 대조하여 작성·점검합니다. 일반 실무 참고용 자료이며, 개별 법률·노무·세무 분쟁은 고용노동부(1350)·국세상담센터(126)·대한법률구조공단(132) 또는 전문가 확인을 권장합니다. 법령 개정이나 오류 발견 시 <a href="/contact/">법령·내용 정정 제보</a>로 알려주시면 확인 후 반영합니다.</p>
+    </div>
+    
         </article>
 
         <aside class="editorial-aside" aria-label="연계 서식 및 계산기">
@@ -236,7 +267,7 @@
           <div class="footer-brand">바로서식 (BaroDoc)</div>
           <p class="footer-desc">
             회원가입 없이 웹 브라우저에서 바로 작성하고, 투명 도장을 찍어 깨지지 않는 A4로 인쇄·PDF 저장하는 한국 표준 무료 문서 도구입니다.
-            모든 입력 데이터는 서버에 저장되지 않고 브라우저 내에서만 안전하게 처리됩니다.
+            서식·도장·계산기 입력 데이터는 서버에 저장되지 않고 브라우저 내에서만 처리됩니다. (문의하기 폼 접수 내용 제외 · <a href="/privacy/" style="color:inherit;text-decoration:underline;">개인정보처리방침</a>)
           </p>
         </div>
         <div class="footer-col">

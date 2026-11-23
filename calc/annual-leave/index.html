@@ -101,13 +101,21 @@
               <button type="button" class="calc-mode-btn" data-al-basis="fiscal">회계연도 (1월 1일) 기준</button>
             </div>
 
+            <div class="field" style="margin-bottom:12px;">
+              <label>재직 상태 선택 (1년 경계 정확 계산)</label>
+              <div class="calc-mode-tabs" role="tablist" aria-label="재직 상태 선택" style="margin-bottom:0;">
+                <button type="button" class="calc-mode-btn active" data-al-status="active">재직 중 (오늘/조회일 기준)</button>
+                <button type="button" class="calc-mode-btn" data-al-status="retired">퇴직 예정 · 퇴사 정산</button>
+              </div>
+            </div>
+
             <div class="field-row">
               <div class="field">
                 <label for="alJoinDate">입사일</label>
                 <input type="date" id="alJoinDate">
               </div>
               <div class="field">
-                <label for="alBaseDate">계산 기준일 (퇴사일/오늘)</label>
+                <label for="alBaseDate" id="alBaseDateLabel">계산 기준일 (재직 중 · 오늘/조회일)</label>
                 <input type="date" id="alBaseDate">
               </div>
             </div>
@@ -124,12 +132,12 @@
                 <input type="number" id="alUnusedDays" min="0" max="40" step="0.5" value="5" placeholder="예: 5">
               </div>
             </div>
-            <p class="field-help" style="margin:0;">1일 통상임금 = 월 통상임금 ÷ 209시간 × 8시간 (주 40시간 기준 예상치)</p>
+            <p class="field-help" style="margin:0;">1일 통상임금 = 월 통상임금 ÷ 209시간 × 8시간 (주 40시간 기준 참고치)</p>
           </div>
 
           <div class="calc-card">
             <div class="calc-result-hero">
-              <div class="calc-result-label">기준일 현재 발생 연차유급휴가</div>
+              <div class="calc-result-label" id="alHeroLabel">기준일 현재 발생 연차유급휴가</div>
               <div class="calc-result-main" id="alHeroVal">총 15일</div>
               <div class="calc-result-sub" id="alHeroSub">근속연차 기준 산정</div>
             </div>
@@ -141,9 +149,9 @@
                 <div class="sub">입사일 ~ 기준일</div>
               </div>
               <div class="calc-stat-box">
-                <div class="lbl">현재 연차 일수</div>
+                <div class="lbl">인정 연차 일수</div>
                 <div class="val" id="alYearDaysVal">-</div>
-                <div class="sub">80% 이상 출근 기준</div>
+                <div class="sub">80% 이상 출근 가정</div>
               </div>
               <div class="calc-stat-box">
                 <div class="lbl">미사용 연차수당 예상</div>
@@ -152,6 +160,7 @@
               </div>
             </div>
 
+            <div id="alStatusAlert" class="guide-callout warn" style="display:none;margin:0 0 12px;font-size:13px;"></div>
             <p id="alFiscalNote" class="field-help" style="margin:0 0 10px;"></p>
 
             <div class="calc-table-wrap">
@@ -212,8 +221,12 @@
 <p>많은 회사가 인사 관리 편의를 위해 매년 1월 1일에 전 직원 연차를 일괄 부여(회계연도 기준)합니다. 하지만 근로기준법 원칙은 <strong>입사일 기준</strong>이므로, 퇴사할 때 회계연도 기준으로 받은 총 연차보다 입사일 기준 법정 연차가 더 많다면 <strong>부족한 일수만큼 추가로 연차수당을 청구</strong>할 수 있습니다.</p>
 
 <div class="guide-callout">
-  <strong>퇴사 준비 중이라면 함께 확인하세요</strong>
-  <a href="/guide/severance-pay-annual-leave/" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">퇴직금·미사용 연차수당 계산법과 14일 이내 미지급 대처 가이드</a> 및 <a href="/sajikseo/" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">무료 사직서 양식 작성기</a>에서 퇴사 절차를 한 번에 마무리하세요.
+  <strong>공식 법령 및 행정해석 근거</strong>
+  <ul style="margin:6px 0 0;padding-left:18px;">
+    <li><a href="https://www.law.go.kr/법령/근로기준법/제60조" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국가법령정보센터 — 「근로기준법」 제60조(연차 유급휴가)</a></li>
+    <li><a href="https://www.moel.go.kr/news/enews/report/enewsView.do?bbs_id=12&news_seq=13052" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">고용노동부 — 1년 기간제·만 1년 퇴직 시 연차유급휴가 변경 행정해석 안내</a></li>
+  </ul>
+  <p style="margin:8px 0 0;">퇴사 준비 중이라면 <a href="/guide/severance-pay-annual-leave/" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">퇴직금·미사용 연차수당 계산법과 14일 이내 미지급 대처 가이드</a> 및 <a href="/sajikseo/" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">무료 사직서 양식 작성기</a>도 함께 확인하세요.</p>
 </div>
 
 
@@ -251,6 +264,15 @@
         </details>
         
           </div>
+          
+    <div class="review-meta-box">
+      <div class="review-meta-head">
+        <strong>콘텐츠 검수 및 출처 기준 안내</strong>
+        <span class="review-meta-date">최종 검토일: 2026-11-23</span>
+      </div>
+      <p>본 페이지의 서식·계산식·실무 안내는 <strong>바로서식 편집·검수팀</strong>이 국가법령정보센터·고용노동부·국세청·최저임금위원회 등 공공기관 공식 고시 원문을 대조하여 작성·점검합니다. 일반 실무 참고용 자료이며, 개별 법률·노무·세무 분쟁은 고용노동부(1350)·국세상담센터(126)·대한법률구조공단(132) 또는 전문가 확인을 권장합니다. 법령 개정이나 오류 발견 시 <a href="/contact/">법령·내용 정정 제보</a>로 알려주시면 확인 후 반영합니다.</p>
+    </div>
+    
         </article>
 
         <aside class="editorial-aside" aria-label="연계 서식 및 계산기">
@@ -280,7 +302,7 @@
           <div class="footer-brand">바로서식 (BaroDoc)</div>
           <p class="footer-desc">
             회원가입 없이 웹 브라우저에서 바로 작성하고, 투명 도장을 찍어 깨지지 않는 A4로 인쇄·PDF 저장하는 한국 표준 무료 문서 도구입니다.
-            모든 입력 데이터는 서버에 저장되지 않고 브라우저 내에서만 안전하게 처리됩니다.
+            서식·도장·계산기 입력 데이터는 서버에 저장되지 않고 브라우저 내에서만 처리됩니다. (문의하기 폼 접수 내용 제외 · <a href="/privacy/" style="color:inherit;text-decoration:underline;">개인정보처리방침</a>)
           </p>
         </div>
         <div class="footer-col">

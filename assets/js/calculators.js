@@ -123,8 +123,10 @@
 
     const elJoin = document.getElementById('alJoinDate');
     const elBase = document.getElementById('alBaseDate');
+    const elBaseLabel = document.getElementById('alBaseDateLabel');
     const elMonthly = document.getElementById('alMonthlyWage');
     const elUnused = document.getElementById('alUnusedDays');
+    const elHeroLabel = document.getElementById('alHeroLabel');
     const elHeroVal = document.getElementById('alHeroVal');
     const elHeroSub = document.getElementById('alHeroSub');
     const elTenureVal = document.getElementById('alTenureVal');
@@ -132,8 +134,10 @@
     const elPayVal = document.getElementById('alPayVal');
     const elTableBody = document.getElementById('alTableBody');
     const elFiscalNote = document.getElementById('alFiscalNote');
+    const elStatusAlert = document.getElementById('alStatusAlert');
 
     let basis = 'join'; // join (입사일 기준) | fiscal (회계연도 1월1일 기준)
+    let empStatus = 'active'; // active (재직 중) | retired (퇴직일 기준)
 
     if (elBase && !elBase.value) elBase.value = U.todayISO();
     if (elJoin && !elJoin.value) {
@@ -157,12 +161,38 @@
       return Math.max(0, years);
     }
 
+    function addYears(date, n) {
+      const d = new Date(date.getTime());
+      const origMonth = d.getMonth();
+      d.setFullYear(d.getFullYear() + n);
+      if (d.getMonth() !== origMonth) d.setDate(0);
+      return d;
+    }
+
+    function isExactAnniversary(start, end, years) {
+      if (years < 1) return false;
+      return addYears(start, years).getTime() === end.getTime();
+    }
+
     function leaveForCompletedYears(years) {
       if (years < 1) return 0;
       return Math.min(25, 15 + Math.floor((years - 1) / 2));
     }
 
     function render() {
+      if (elBaseLabel) {
+        elBaseLabel.textContent =
+          empStatus === 'retired'
+            ? '퇴직일 (마지막 근무일의 다음 날)'
+            : '계산 기준일 (재직 중 · 오늘/조회일)';
+      }
+      if (elHeroLabel) {
+        elHeroLabel.textContent =
+          empStatus === 'retired'
+            ? '퇴직일 기준 인정 연차유급휴가'
+            : '기준일 현재 발생 연차유급휴가';
+      }
+
       const joinIso = elJoin.value;
       const baseIso = elBase.value || U.todayISO();
       const join = new Date(joinIso + 'T00:00:00');
@@ -172,25 +202,46 @@
         if (elHeroVal) elHeroVal.textContent = '날짜를 확인해 주세요';
         if (elHeroSub) elHeroSub.textContent = '기준일은 입사일과 같거나 이후 날짜여야 합니다.';
         if (elTableBody) elTableBody.innerHTML = '';
+        if (elStatusAlert) elStatusAlert.style.display = 'none';
         return;
       }
 
       const totalMonths = fullMonthsBetween(join, base);
       const years = fullYearsBetween(join, base);
+      const exactAnniv = isExactAnniversary(join, base, years);
       const tenureStr = U.calcTenure(joinIso, baseIso) || '입사 당일';
 
       let currentAnnualDays = 0;
       let subMsg = '';
+      let alertHtml = '';
       const rows = [];
 
       if (basis === 'join') {
-        // 입사일 기준 (근로기준법 제60조 원칙)
+        // 입사일 기준 (근로기준법 제60조 원칙 + 대법원 2021다227100 판결)
         if (years < 1) {
           currentAnnualDays = Math.min(11, totalMonths);
           subMsg = `입사 1년 미만 · 경과 개근 월수(${totalMonths}개월) 기준 월차 최대 11일 발생`;
+        } else if (empStatus === 'retired' && exactAnniv) {
+          // 정확히 만 N년(예: 1년=365일)만 근무하고 퇴직한 경우: (N+1)년차 연차 미발생
+          if (years === 1) {
+            currentAnnualDays = 11;
+            subMsg = '정확히 만 1년(365일) 근무 후 퇴직 · 2년차 15일 미발생, 1년 미만 월차 최대 11일만 인정';
+            alertHtml =
+              '<strong>만 1년 정각 퇴직 경계 적용 (고용노동부 행정해석 · 대법원 2021다227100):</strong> 정확히 만 1년(365일)만 근무하고 계약이 종료·퇴직하면 2년차 연차 15일은 발생하지 않으며 1년 미만 월차(최대 11일)만 인정됩니다. 15일 연차를 받으려면 <strong>366일째까지 근로관계가 유지</strong>(퇴직일이 1일 더 이후)되어야 합니다.';
+          } else {
+            currentAnnualDays = leaveForCompletedYears(years - 1);
+            subMsg = `정확히 만 ${years}년 근무 후 퇴직 · ${years + 1}년차 신규 연차(${leaveForCompletedYears(years)}일) 미발생`;
+            alertHtml = `<strong>만 ${years}년 정각 퇴직 경계 적용:</strong> 대법원 판례 및 고용노동부 해석에 따라 퇴직일 당일 새로 도래하는 ${years + 1}년차 연차(${leaveForCompletedYears(years)}일)는 다음 해 근로관계가 유지되지 않으므로 발생하지 않습니다.`;
+          }
         } else {
           currentAnnualDays = leaveForCompletedYears(years);
-          subMsg = `근속 ${years}년차 (${years + 1}년차 사용분) · 1년 80% 이상 출근 가정`;
+          if (empStatus === 'active' && years === 1 && exactAnniv) {
+            subMsg = `만 1년 완료(366일째 재직 중) · 2년차 연차 15일 발생 (단, 오늘 퇴직 시 15일 미발생)`;
+            alertHtml =
+              '<strong>1년 경계 안내:</strong> 현재 <em>재직 중</em>이므로 만 1년 완료에 따른 15일이 발생합니다. 만약 오늘을 퇴직일(365일 근무 종료)로 계약이 끝난다면 상단에서 <strong>‘퇴직 예정·퇴사 정산’</strong>을 선택해 확인하세요.';
+          } else {
+            subMsg = `근속 ${years}년차 (${years + 1}년차 사용분) · 1년 80% 이상 출근 가정`;
+          }
         }
 
         // 연차 발생 이력 표 생성
@@ -199,27 +250,35 @@
           label: '1년 미만 (월차)',
           period: `${U.formatKoreanDate(joinIso)} ~ 만 1년 전`,
           days: `${firstYearDays}일`,
-          note: '1개월 개근 시 1일 (최대 11일)',
+          note: empStatus === 'retired' && exactAnniv && years === 1 ? '만 1년 정각 퇴직 시 인정분' : '1개월 개근 시 1일 (최대 11일)',
         });
 
         const maxYearToShow = Math.max(years, 1);
         for (let y = 1; y <= Math.min(maxYearToShow + 1, 22); y++) {
-          const grantDate = new Date(join);
-          grantDate.setFullYear(join.getFullYear() + y);
+          const grantDate = addYears(join, y);
           const grantIso = `${grantDate.getFullYear()}-${String(grantDate.getMonth() + 1).padStart(2, '0')}-${String(grantDate.getDate()).padStart(2, '0')}`;
           const days = leaveForCompletedYears(y);
-          const isCurrent = y === years;
-          const isFuture = grantDate > base;
+          let noteText = '이전 발생분';
+          if (empStatus === 'retired' && exactAnniv && y === years) {
+            noteText = '퇴직 경계 미발생 (다음 날 미근무)';
+          } else if (empStatus === 'retired' && exactAnniv && y === years - 1) {
+            noteText = '최종 발생 적용 연차';
+          } else if (y === years) {
+            noteText = empStatus === 'retired' ? '퇴직 전 최종 발생 연차' : '현재 적용 연차';
+          } else if (grantDate > base) {
+            noteText = empStatus === 'retired' ? '퇴직 후 (미발생)' : '예정 연차';
+          }
           rows.push({
             label: `${y}년 만근 (${y + 1}년차)`,
             period: `${U.formatKoreanDate(grantIso)} 발생`,
             days: `${days}일`,
-            note: isCurrent ? '현재 적용 연차' : isFuture ? '예정 연차' : '이전 발생분',
+            note: noteText,
           });
         }
 
         if (elFiscalNote) {
-          elFiscalNote.textContent = '근로기준법 제60조 원칙(입사일 기준)으로 계산되었습니다. 상시 5인 이상 사업장에 적용됩니다.';
+          elFiscalNote.textContent =
+            '근로기준법 제60조 원칙(입사일 기준) 및 고용노동부 변경 행정해석(2021.12.16)으로 계산되었습니다. 상시 5인 이상 사업장·주 15시간 이상 근로자에게 적용됩니다.';
         }
       } else {
         // 회계연도 (매년 1월 1일) 기준
@@ -235,7 +294,7 @@
           const yearEnd = new Date(joinYear, 11, 31);
           const daysInYear = Math.round((yearEnd - yearStart) / 86400000) + 1;
           const workedDays = Math.round((yearEnd - join) / 86400000) + 1;
-          const prorated = Math.round((15 * (workedDays / daysInYear)) * 10) / 10;
+          const prorated = Math.round(15 * (workedDays / daysInYear) * 10) / 10;
           currentAnnualDays = prorated;
           subMsg = `${baseYear}년 1월 1일 비례 부여 (${joinYear}년 재직 ${workedDays}일/${daysInYear}일 기준)`;
         } else {
@@ -243,11 +302,16 @@
           subMsg = `${baseYear}년 1월 1일 일괄 부여 (회계연도 기준 ${yearDiff}번째 해)`;
         }
 
+        if (empStatus === 'retired') {
+          alertHtml =
+            '<strong>퇴직 시 회계연도 기준 정산 주의:</strong> 퇴사할 때 회계연도(1월 1일) 기준으로 받은 누적 연차가 법정 <strong>입사일 기준</strong>보다 적다면 입사일 기준으로 재정산받아야 합니다. 정확한 퇴사 정산은 상단 ‘입사일 기준’ 탭과 함께 비교하세요.';
+        }
+
         const yearStart = new Date(joinYear, 0, 1);
         const yearEnd = new Date(joinYear, 11, 31);
         const daysInYear = Math.round((yearEnd - yearStart) / 86400000) + 1;
         const workedDays = Math.round((yearEnd - join) / 86400000) + 1;
-        const prorated = Math.round((15 * (workedDays / daysInYear)) * 10) / 10;
+        const prorated = Math.round(15 * (workedDays / daysInYear) * 10) / 10;
 
         rows.push({
           label: `${joinYear}년 (입사 연도)`,
@@ -273,7 +337,17 @@
         }
 
         if (elFiscalNote) {
-          elFiscalNote.textContent = '회계연도(1월 1일) 기준은 회사 편의용 방식이며, 퇴사 시 입사일 기준보다 연차가 적다면 더 유리한 입사일 기준으로 정산받아야 합니다.';
+          elFiscalNote.textContent =
+            '회계연도(1월 1일) 기준은 회사 편의용 방식이며, 퇴사 시 입사일 기준보다 연차가 적다면 더 유리한 입사일 기준으로 정산받아야 합니다.';
+        }
+      }
+
+      if (elStatusAlert) {
+        if (alertHtml) {
+          elStatusAlert.innerHTML = alertHtml;
+          elStatusAlert.style.display = 'block';
+        } else {
+          elStatusAlert.style.display = 'none';
         }
       }
 
@@ -310,6 +384,16 @@
         basis = btn.getAttribute('data-al-basis');
         root.querySelectorAll('[data-al-basis]').forEach((b) => {
           b.classList.toggle('active', b.getAttribute('data-al-basis') === basis);
+        });
+        render();
+      });
+    });
+
+    root.querySelectorAll('[data-al-status]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        empStatus = btn.getAttribute('data-al-status');
+        root.querySelectorAll('[data-al-status]').forEach((b) => {
+          b.classList.toggle('active', b.getAttribute('data-al-status') === empStatus);
         });
         render();
       });
@@ -498,10 +582,13 @@
     const elPay3m = document.getElementById('sevPay3m');
     const elBonus = document.getElementById('sevBonusYear');
     const elLeavePay = document.getElementById('sevAnnualPay');
+    const elOrdinary = document.getElementById('sevOrdinaryDaily');
+    const elExcluded = document.getElementById('sevExcludedDays');
     const elHeroVal = document.getElementById('sevHeroVal');
     const elHeroSub = document.getElementById('sevHeroSub');
     const elDaysVal = document.getElementById('sevDaysVal');
     const elAvgWage = document.getElementById('sevAvgWageVal');
+    const elAvgWageSub = document.getElementById('sevAvgWageSub');
     const elNetNote = document.getElementById('sevRuleNote');
 
     if (elLeave && !elLeave.value) elLeave.value = U.todayISO();
@@ -516,6 +603,7 @@
       const leave = new Date((elLeave.value || '') + 'T00:00:00');
       if (isNaN(join.getTime()) || isNaN(leave.getTime()) || leave <= join) {
         if (elHeroVal) elHeroVal.textContent = '날짜를 확인해 주세요';
+        if (elHeroSub) elHeroSub.textContent = '퇴직일은 입사일 이후 날짜여야 합니다.';
         return;
       }
       const totalDays = Math.round((leave - join) / 86400000);
@@ -524,28 +612,71 @@
       threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
       const days3m = Math.max(89, Math.min(92, Math.round((leave - threeMonthsAgo) / 86400000)));
 
+      const excludedDays = Math.max(0, Math.floor(U.parseNumber(elExcluded ? elExcluded.value : 0)));
+      const effectiveDays3m = days3m - excludedDays;
+
       const pay3m = Math.max(0, U.parseNumber(elPay3m.value));
       const bonus3m = Math.round(Math.max(0, U.parseNumber(elBonus.value)) * (3 / 12));
       const annual3m = Math.round(Math.max(0, U.parseNumber(elLeavePay.value)) * (3 / 12));
+      const ordinaryDaily = Math.max(0, U.parseNumber(elOrdinary ? elOrdinary.value : 0));
       const total3m = pay3m + bonus3m + annual3m;
-      const avgDaily = total3m / days3m;
-      const severance = totalDays >= 365 ? Math.round(avgDaily * 30 * (totalDays / 365)) : 0;
 
-      if (elDaysVal) elDaysVal.textContent = `${U.formatNumber(totalDays)}일 (${U.calcTenure(elJoin.value, elLeave.value) || '1년 미만'})`;
-      if (elAvgWage) elAvgWage.textContent = `${U.formatNumber(Math.round(avgDaily))}원 / 일`;
+      if (elDaysVal) {
+        elDaysVal.textContent = `${U.formatNumber(totalDays)}일 (${U.calcTenure(elJoin.value, elLeave.value) || '1년 미만'})`;
+      }
+
+      if (effectiveDays3m <= 0) {
+        if (elHeroVal) elHeroVal.textContent = '공식 계산기 확인 필요';
+        if (elHeroSub) elHeroSub.textContent = '최근 3개월 전체가 제외기간인 경우 그 직전 3개월 임금으로 별도 산정해야 합니다.';
+        if (elAvgWage) elAvgWage.textContent = '-';
+        if (elNetNote) {
+          elNetNote.innerHTML =
+            '<div>• 최근 3개월 전체가 출산휴가·육아휴직·업무상 재해 휴업 등 제외기간(근로기준법 시행령 제2조)에 해당하는 경우, 제외기간 직전 3개월을 기준으로 산정합니다.</div><div>• 정확한 금액은 <a href="https://www.moel.go.kr/retirementpayCal.do" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">고용노동부 공식 퇴직금 계산기</a>로 확인해 주세요.</div>';
+        }
+        return;
+      }
+
+      const avgDaily = total3m / effectiveDays3m;
+      const usedOrdinary = ordinaryDaily > 0 && ordinaryDaily > avgDaily;
+      const appliedDaily = usedOrdinary ? ordinaryDaily : avgDaily;
+      const severance = totalDays >= 365 ? Math.round(appliedDaily * 30 * (totalDays / 365)) : 0;
+
+      if (elAvgWage) {
+        elAvgWage.textContent = `${U.formatNumber(Math.round(appliedDaily))}원 / 일`;
+      }
+      if (elAvgWageSub) {
+        elAvgWageSub.textContent = usedOrdinary
+          ? '통상임금 하한 보호 적용 (평균임금 초과)'
+          : excludedDays > 0
+          ? `제외 ${excludedDays}일 차감 (${effectiveDays3m}일 기준)`
+          : `3개월 총임금 ÷ ${days3m}일`;
+      }
+
       if (totalDays < 365) {
         if (elHeroVal) elHeroVal.textContent = '지급 대상 아님 (1년 미만)';
         if (elHeroSub) elHeroSub.textContent = '법정 퇴직금은 계속근로기간 1년(365일) 이상 + 주 15시간 이상 근로 시 발생합니다.';
       } else {
         if (elHeroVal) elHeroVal.textContent = `${U.formatNumber(severance)}원`;
-        if (elHeroSub) elHeroSub.textContent = `${U.formatKoreanCurrency(severance)} (세전 예상 · 퇴직소득세 별도)`;
+        if (elHeroSub) {
+          elHeroSub.textContent = `${U.formatKoreanCurrency(severance)} (세전 참고치${usedOrdinary ? ' · 1일 통상임금 적용' : ''})`;
+        }
       }
+
       if (elNetNote) {
-        elNetNote.innerHTML = `<div>• 퇴직 전 3개월 기준일수: <strong>${days3m}일</strong> / 3개월 산입 임금 총액: <strong>${U.formatNumber(total3m)}원</strong></div><div>• 근로자퇴직급여보장법상 퇴직금은 퇴직일로부터 <strong>14일 이내</strong> 지급이 원칙입니다. (IRP 계좌 이전 필수)</div>`;
+        const ordLine = usedOrdinary
+          ? `<div style="color:var(--brand-blue);font-weight:700;">✓ 근로기준법 제2조 통상임금 하한 보호 적용: 산출 1일 평균임금(${U.formatNumber(Math.round(avgDaily))}원)보다 1일 통상임금(${U.formatNumber(Math.round(ordinaryDaily))}원)이 높아 통상임금으로 계산했습니다.</div>`
+          : ordinaryDaily > 0
+          ? `<div>• 산출 1일 평균임금(${U.formatNumber(Math.round(avgDaily))}원)이 1일 통상임금(${U.formatNumber(Math.round(ordinaryDaily))}원) 이상이므로 평균임금을 적용했습니다.</div>`
+          : `<div>• 1일 통상임금을 입력하면 평균임금과 자동 비교해 더 높은 금액으로 계산합니다.</div>`;
+        const exclLine =
+          excludedDays > 0
+            ? `<div>• 산정 기준일수: ${days3m}일 − 제외기간 ${excludedDays}일 = <strong>${effectiveDays3m}일</strong> / 산입 임금 총액: <strong>${U.formatNumber(total3m)}원</strong></div>`
+            : `<div>• 퇴직 전 3개월 기준일수: <strong>${days3m}일</strong> / 3개월 산입 임금 총액: <strong>${U.formatNumber(total3m)}원</strong></div>`;
+        elNetNote.innerHTML = `${ordLine}${exclLine}<div>• 본 결과는 DB형/법정 퇴직금 세전 참고치이며, 퇴직소득세·DC형 운용수익·중도인출·특수 수당 산입 여부는 <a href="https://www.moel.go.kr/retirementpayCal.do" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">고용노동부 공식 퇴직금 계산기</a> 또는 인사팀을 통해 최종 확인하세요.</div>`;
       }
     }
 
-    [elJoin, elLeave, elPay3m, elBonus, elLeavePay].forEach((el) => {
+    [elJoin, elLeave, elPay3m, elBonus, elLeavePay, elOrdinary, elExcluded].forEach((el) => {
       if (el) el.addEventListener('input', render);
       if (el) el.addEventListener('change', render);
     });
@@ -553,7 +684,8 @@
   }
 
   /* ========================================================================
-     5. 실업급여 계산기 (/calc/unemployment/) — 2026 기준
+     5. 실업급여 계산기 (/calc/unemployment/) — 2026.01.01 이후 이직자 공식 기준
+     상한액: 68,100원 / 하한액: 2026 최저시급(10,320원) × 80% × 소정근로시간 (8h = 66,048원)
      ======================================================================== */
   function initUnemploymentCalculator() {
     const root = document.getElementById('unempCalcApp');
@@ -566,9 +698,13 @@
     const elHeroVal = document.getElementById('ueHeroVal');
     const elHeroSub = document.getElementById('ueHeroSub');
     const elDailyVal = document.getElementById('ueDailyVal');
+    const elDailySub = document.getElementById('ueDailySub');
     const elDaysVal = document.getElementById('ueDaysVal');
     const elMonthVal = document.getElementById('ueMonthVal');
     const elNote = document.getElementById('ueRuleNote');
+
+    const CAP_2026 = 68100;
+    const MIN_HOURLY_2026 = 10320;
 
     const DAYS_TABLE = {
       under50: { '0': 120, '1': 150, '3': 180, '5': 210, '10': 240 },
@@ -585,20 +721,26 @@
       const avgDaily = (monthly * 3) / 90;
       const raw60 = avgDaily * 0.6;
 
-      // 2026 기준: 상한액 66,000원, 하한액 = 2026 최저시급(10,320) * 0.8 * 소정근로시간 (8h = 66,048원 -> 상한과 하한 역전 시 법정 하한 66,048 또는 66,000 적용)
-      const cap = 66000;
-      const floor = Math.round(10320 * 0.8 * dailyHours);
-      const effectiveDaily = Math.round(Math.max(Math.min(raw60, cap), Math.min(floor, Math.max(cap, floor))));
+      // 2026년 1월 1일 이후 이직자 공식 기준 (고용보험법 시행령):
+      // 1일 상한액 68,100원 / 1일 하한액 = 2026 최저시급(10,320원) × 80% × 소정근로시간 (8h = 66,048원)
+      const cap = CAP_2026;
+      const floor = Math.round(MIN_HOURLY_2026 * 0.8 * dailyHours);
+      const effectiveDaily = Math.round(Math.min(cap, Math.max(raw60, floor)));
       const total = effectiveDaily * benefitDays;
       const per30 = effectiveDaily * 30;
+
+      let appliedTag = '평균임금 60% 적용';
+      if (raw60 >= cap) appliedTag = `2026 상한액(${U.formatNumber(cap)}원) 적용`;
+      else if (raw60 <= floor) appliedTag = `2026 ${dailyHours}시간 하한액(${U.formatNumber(floor)}원) 적용`;
 
       if (elHeroVal) elHeroVal.textContent = `${U.formatNumber(total)}원`;
       if (elHeroSub) elHeroSub.textContent = `${U.formatKoreanCurrency(total)} (총 ${benefitDays}일 수급 시 예상 합계)`;
       if (elDailyVal) elDailyVal.textContent = `${U.formatNumber(effectiveDaily)}원 / 일`;
+      if (elDailySub) elDailySub.textContent = appliedTag;
       if (elDaysVal) elDaysVal.textContent = `${benefitDays}일 (약 ${Math.round((benefitDays / 30) * 10) / 10}개월)`;
       if (elMonthVal) elMonthVal.textContent = `약 ${U.formatNumber(per30)}원`;
       if (elNote) {
-        elNote.innerHTML = `<div>• 1일 평균임금의 60%: ${U.formatNumber(Math.round(raw60))}원 (상한 66,000원 / ${dailyHours}시간 하한 ${U.formatNumber(floor)}원 적용)</div><div>• 비자발적 이직(권고사직·계약만료 등) + 이직 전 18개월간 피보험단위기간 <strong>180일 이상</strong> 충족 시 수급 가능합니다.</div>`;
+        elNote.innerHTML = `<div>• <strong>적용 기준:</strong> 2026년 1월 1일 이후 이직자 (상한 <strong>68,100원</strong> / ${dailyHours}시간 하한 <strong>${U.formatNumber(floor)}원</strong>) · 산출 평균임금 60%: ${U.formatNumber(Math.round(raw60))}원 → <strong>${appliedTag}</strong></div><div>• 비자발적 이직 + 이직 전 18개월간 피보험단위기간 <strong>180일 이상</strong> 충족 시 수급 가능합니다. (공식 안내: <a href="https://1350.moel.go.kr/rtmview.do?id=1000324861" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">고용노동부 1350</a> · <a href="https://www.work24.go.kr" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">고용24</a>)</div>`;
       }
     }
 
