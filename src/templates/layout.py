@@ -166,7 +166,7 @@ def build_base_html(
           <div class="footer-brand">{cfg['site_name']} ({cfg['site_name_en']})</div>
           <p class="footer-desc">
             회원가입 없이 웹 브라우저에서 바로 작성하고, 투명 도장을 찍어 깨지지 않는 A4로 인쇄·PDF 저장하는 한국 표준 무료 문서 도구입니다.
-            모든 입력 데이터는 서버에 저장되지 않고 브라우저 내에서만 안전하게 처리됩니다.
+            서식·도장·계산기 입력 데이터는 서버에 저장되지 않고 브라우저 내에서만 처리됩니다. (문의하기 폼 접수 내용 제외 · <a href="/privacy/" style="color:inherit;text-decoration:underline;">개인정보처리방침</a>)
           </p>
         </div>
         <div class="footer-col">
@@ -201,7 +201,19 @@ def build_base_html(
 """
 
 
-def build_editorial_section(tool):
+def build_review_meta_box(last_modified="2026-11-23"):
+    return f"""
+    <div class="review-meta-box">
+      <div class="review-meta-head">
+        <strong>콘텐츠 검수 및 출처 기준 안내</strong>
+        <span class="review-meta-date">최종 검토일: {last_modified}</span>
+      </div>
+      <p>본 페이지의 서식·계산식·실무 안내는 <strong>바로서식 편집·검수팀</strong>이 국가법령정보센터·고용노동부·국세청·최저임금위원회 등 공공기관 공식 고시 원문을 대조하여 작성·점검합니다. 일반 실무 참고용 자료이며, 개별 법률·노무·세무 분쟁은 고용노동부(1350)·국세상담센터(126)·대한법률구조공단(132) 또는 전문가 확인을 권장합니다. 법령 개정이나 오류 발견 시 <a href="/contact/">법령·내용 정정 제보</a>로 알려주시면 확인 후 반영합니다.</p>
+    </div>
+    """
+
+
+def build_editorial_section(tool, last_modified="2026-11-23"):
     cur_cat = tool.get("category", "")
     same_cat = [t for t in TOOLS if t["kind"] == "form" and t["key"] != tool["key"] and t.get("category") == cur_cat]
     other_pop = [t for t in TOOLS if t["kind"] == "form" and t["key"] != tool["key"] and t.get("category") != cur_cat]
@@ -307,6 +319,7 @@ def build_editorial_section(tool):
           <div class="faq-list">
             {faqs_html}
           </div>
+          {build_review_meta_box(last_modified)}
         </article>
 
         <aside class="editorial-aside" aria-label="관련 무료 서식 및 계산기">
@@ -324,7 +337,7 @@ def build_editorial_section(tool):
     """
 
 
-def build_form_page_body(tool):
+def build_form_page_body(tool, last_modified="2026-11-23"):
     return f"""
     <section class="page-hero">
       <div class="container">
@@ -433,11 +446,11 @@ def build_form_page_body(tool):
       </div>
     </section>
 
-    {build_editorial_section(tool)}
+    {build_editorial_section(tool, last_modified)}
     """
 
 
-def build_stamp_page_body(tool):
+def build_stamp_page_body(tool, last_modified="2026-11-23"):
     flagship_keys = {"sajikseo", "chayongjeung", "wiimjang", "jaejik", "gyeonjeokseo", "geunro", "georae", "baljuseo", "cheongguseo", "imdaecha", "naeyong", "habuiseo"}
     jump_links = "".join(
         f'<a href="/{t["slug"]}/?stamp=auto">{t["short_name"]}에 바로 찍기 →</a>'
@@ -612,7 +625,7 @@ def build_stamp_page_body(tool):
       </div>
     </section>
 
-    {build_editorial_section(tool)}
+    {build_editorial_section(tool, last_modified)}
     """
 
 
@@ -706,6 +719,7 @@ def build_guide_article_body(cfg, guide, all_guides):
               <a href="/{guide['related_tool']}/" class="btn btn-primary btn-sm">{guide['related_tool_name']} 바로가기 →</a>{sec_btn}
             </div>
           </div>
+          {build_review_meta_box(cfg['last_modified'])}
         </article>
 
         <aside class="editorial-aside" aria-label="관련 도구 및 가이드">
@@ -726,7 +740,7 @@ def build_guide_article_body(cfg, guide, all_guides):
     """
 
 
-def build_calculator_page_body(calc, all_calcs):
+def build_calculator_page_body(calc, all_calcs, last_modified="2026-11-23"):
     faqs_html = "".join(
         f"""
         <details class="faq-item">
@@ -782,6 +796,7 @@ def build_calculator_page_body(calc, all_calcs):
           <div class="faq-list">
             {faqs_html}
           </div>
+          {build_review_meta_box(last_modified)}
         </article>
 
         <aside class="editorial-aside" aria-label="연계 서식 및 계산기">

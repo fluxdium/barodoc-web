@@ -76,6 +76,15 @@ GUIDES = [
   <li><strong>개인 계정·파일 정리 및 비품 반납:</strong> 사내 PC에 로그인된 개인 메신저·브라우저 비밀번호를 모두 로그아웃하고, 회사 영업비밀 자료를 개인 이메일로 반출하지 않도록 각별히 주의하세요.</li>
   <li><strong>사직서 사본 보관:</strong> 제출한 사직서와 접수일(이메일 발송 내역 또는 인사팀 수령 서명)을 반드시 개인 보관해 두세요.</li>
 </ol>
+
+<div class="guide-callout">
+  <strong>공식 법령 및 정부 출처</strong>
+  <ul style="margin:6px 0 0;padding-left:18px;">
+    <li><a href="https://www.law.go.kr/법령/근로기준법/제36조" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국가법령정보센터 — 「근로기준법」 제36조(금품 청산)</a></li>
+    <li><a href="https://1350.moel.go.kr/rtmview.do?id=1000324861" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">고용노동부 고객상담센터(1350) — 2026년 구직급여 수급 기준 안내</a></li>
+    <li><a href="https://www.work24.go.kr" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">고용24 — 실업급여 및 이직확인서 처리 안내</a></li>
+  </ul>
+</div>
 """,
     },
     {
@@ -132,6 +141,15 @@ GUIDES = [
   <li><strong>이체 전 차용증 작성 + 객관적 날짜 확보:</strong> 돈을 보낸 뒤 나중에 차용증을 쓰면 소급 작성 의심을 받습니다. 송금 전에 차용증을 쓰고 확정일자나 우체국 내용증명·이메일 발송 기록으로 작성 시점을 남기세요.</li>
   <li><strong>실제 원리금 상환 이력 유지:</strong> 매월 또는 분기별로 약속한 원금이나 이자를 자녀 본인 소득에서 부모 계좌로 이체한 통장 내역이 가장 강력한 증거입니다.</li>
 </ol>
+
+<div class="guide-callout">
+  <strong>공식 법령 및 상담 출처</strong>
+  <ul style="margin:6px 0 0;padding-left:18px;">
+    <li><a href="https://www.law.go.kr/법령/이자제한법" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국가법령정보센터 — 「이자제한법」 (법정 최고이자율 연 20%)</a></li>
+    <li><a href="https://www.law.go.kr/법령/상속세및증여세법/제41조의4" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국가법령정보센터 — 「상속세 및 증여세법」 제41조의4</a></li>
+    <li><a href="https://www.klac.or.kr" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">대한법률구조공단(132)</a> · <a href="https://www.nts.go.kr" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국세청 국세상담센터(126)</a></li>
+  </ul>
+</div>
 """,
     },
     {
@@ -193,6 +211,15 @@ GUIDES = [
   <li><strong>포괄임금 및 식대 포함 시 주의:</strong> 월급에 비과세 식대나 연장근로수당을 포함할 경우, 기본급과 제수당 항목을 계약서에 명확히 구분해 기재해야 합니다.</li>
   <li><strong>근로계약서 미작성·미교부 처벌:</strong> 정규직 미교부는 500만 원 이하 벌금, 기간제·단시간 근로자 미교부는 500만 원 이하 과태료 대상입니다.</li>
 </ul>
+
+<div class="guide-callout">
+  <strong>공식 법령 및 고시 출처</strong>
+  <ul style="margin:6px 0 0;padding-left:18px;">
+    <li><a href="https://www.minimumwage.go.kr" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">최저임금위원회 — 2026년 최저임금(시급 10,320원) 고시</a></li>
+    <li><a href="https://www.law.go.kr/법령/근로기준법/제17조" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국가법령정보센터 — 「근로기준법」 제17조·제54조·제55조</a></li>
+    <li><a href="https://www.moel.go.kr" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">고용노동부 (고객상담센터 1350)</a></li>
+  </ul>
+</div>
 """,
     },
     {
@@ -246,6 +273,14 @@ GUIDES = [
   <li><strong>전자세금계산서 발행 기한 준수:</strong> 원칙적으로 공급시기가 속하는 달의 <strong>다음 달 10일</strong>까지 발행해야 지연발급 가산세(1%)를 피할 수 있습니다.</li>
   <li><strong>거래명세서 인수 서명 확보:</strong> 물품 배송 시 공급자 보관용(적색) 하단 '인수자 확인' 칸에 담당자 서명을 받아두면 납품 완료 증빙이 확실해집니다.</li>
 </ol>
+
+<div class="guide-callout">
+  <strong>공식 법령 및 국세청 출처</strong>
+  <ul style="margin:6px 0 0;padding-left:18px;">
+    <li><a href="https://www.law.go.kr/법령/부가가치세법" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국가법령정보센터 — 「부가가치세법」 (세금계산서 발급 시기 및 세율)</a></li>
+    <li><a href="https://www.hometax.go.kr" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국세청 홈택스 — 전자세금계산서 안내</a></li>
+  </ul>
+</div>
 """,
     },
     {
@@ -296,6 +331,14 @@ GUIDES = [
   <li><strong>위임 유효기간 설정:</strong> 위임장 하단에 유효기간(예: 작성일로부터 1개월)을 명시해 두면 이후 재사용 위험을 차단할 수 있습니다.</li>
   <li><strong>수정액·수정테이프 사용 금지:</strong> 주요 관공서와 금융기관은 수정 흔적이 있는 위임장을 위변조 위험으로 간주해 접수하지 않습니다. 오타가 있다면 반드시 새로 출력해 날인하세요.</li>
 </ol>
+
+<div class="guide-callout">
+  <strong>공식 법령 및 민원 출처</strong>
+  <ul style="margin:6px 0 0;padding-left:18px;">
+    <li><a href="https://www.law.go.kr/법령/민법/제114조" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국가법령정보센터 — 「민법」 제114조(대리행위의 효력)</a></li>
+    <li><a href="https://www.gov.kr" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">정부24 — 주민등록·인감·민원 대리 발급 안내 (1588-2188)</a></li>
+  </ul>
+</div>
 """,
     },
     {
@@ -347,8 +390,12 @@ GUIDES = [
 </ol>
 
 <div class="guide-callout">
-  <strong>한글·워드 없이 바로서식에서 한 번에 끝내기</strong>
-  바로서식의 <a href="/stamp/" style="color:var(--seal-red);font-weight:700;text-decoration:underline;">무료 온라인 도장 만들기</a>에서 도장을 만들고 '내 도장함에 저장'을 누르면, 사직서·차용증·견적서·재직증명서 등 7종 서식에 클릭 한 번으로 정확히 '(인)' 위치에 겹쳐 찍어 바로 A4 PDF로 저장할 수 있습니다.
+  <strong>한글·워드 없이 바로서식에서 한 번에 끝내기 · 공식 법령 출처</strong>
+  바로서식의 <a href="/stamp/" style="color:var(--seal-red);font-weight:700;text-decoration:underline;">무료 온라인 도장 만들기</a>에서 도장을 만들고 '내 도장함에 저장'을 누르면, 사직서·차용증·견적서·재직증명서 등 52종 서식에 클릭 한 번으로 정확히 '(인)' 위치에 겹쳐 찍어 바로 A4 PDF로 저장할 수 있습니다.
+  <ul style="margin:8px 0 0;padding-left:18px;">
+    <li><a href="https://www.law.go.kr/법령/전자문서및전자거래기본법/제4조" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국가법령정보센터 — 「전자문서 및 전자거래 기본법」 제4조</a></li>
+    <li><a href="https://www.law.go.kr/법령/전자서명법" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국가법령정보센터 — 「전자서명법」</a></li>
+  </ul>
 </div>
 """,
     },

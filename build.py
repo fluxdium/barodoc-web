@@ -154,13 +154,13 @@ def build(cfg):
     for tool in TOOLS:
         path = f"/{tool['slug']}/"
         if tool["kind"] == "stamp":
-            body_html = build_stamp_page_body(tool)
+            body_html = build_stamp_page_body(tool, lastmod)
             extra_scripts = [
                 "/assets/js/stamp-engine.js",
                 "/assets/js/stamp-page.js",
             ]
         else:
-            body_html = build_form_page_body(tool)
+            body_html = build_form_page_body(tool, lastmod)
             if tool.get("js_bundle"):
                 extra_scripts = [
                     "/assets/js/stamp-engine.js",
@@ -219,7 +219,7 @@ def build(cfg):
                 description=calc["description"],
                 keywords=calc["keywords"],
                 active_slug="calc",
-                body_html=build_calculator_page_body(calc, CALCULATORS),
+                body_html=build_calculator_page_body(calc, CALCULATORS, lastmod),
                 extra_scripts=["/assets/js/calculators.js"],
                 json_ld_items=c_ld,
             ),

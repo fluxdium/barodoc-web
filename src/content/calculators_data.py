@@ -128,8 +128,12 @@ CALCULATORS = [
 </ol>
 
 <div class="guide-callout">
-  <strong>관련 실무 가이드 함께 보기</strong>
-  일반과세자·간이과세자·면세사업자별 세금계산서 발행 기준이 궁금하다면 <a href="/guide/simplified-taxpayer-quotation/" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">간이과세자·일반과세자 견적서 및 부가세 작성법</a>을 참고하세요.
+  <strong>공식 법령 출처 및 관련 가이드</strong>
+  <ul style="margin:6px 0 0;padding-left:18px;">
+    <li><a href="https://www.law.go.kr/법령/부가가치세법" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국가법령정보센터 — 「부가가치세법」</a></li>
+    <li><a href="https://www.hometax.go.kr" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국세청 홈택스 — 전자세금계산서 발급 및 신고 안내</a></li>
+  </ul>
+  <p style="margin:8px 0 0;">일반과세자·간이과세자·면세사업자별 세금계산서 발행 기준은 <a href="/guide/simplified-taxpayer-quotation/" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">간이과세자·일반과세자 견적서 및 부가세 작성법</a>을 참고하세요.</p>
 </div>
 """,
         "faqs": [
@@ -167,13 +171,21 @@ CALCULATORS = [
               <button type="button" class="calc-mode-btn" data-al-basis="fiscal">회계연도 (1월 1일) 기준</button>
             </div>
 
+            <div class="field" style="margin-bottom:12px;">
+              <label>재직 상태 선택 (1년 경계 정확 계산)</label>
+              <div class="calc-mode-tabs" role="tablist" aria-label="재직 상태 선택" style="margin-bottom:0;">
+                <button type="button" class="calc-mode-btn active" data-al-status="active">재직 중 (오늘/조회일 기준)</button>
+                <button type="button" class="calc-mode-btn" data-al-status="retired">퇴직 예정 · 퇴사 정산</button>
+              </div>
+            </div>
+
             <div class="field-row">
               <div class="field">
                 <label for="alJoinDate">입사일</label>
                 <input type="date" id="alJoinDate">
               </div>
               <div class="field">
-                <label for="alBaseDate">계산 기준일 (퇴사일/오늘)</label>
+                <label for="alBaseDate" id="alBaseDateLabel">계산 기준일 (재직 중 · 오늘/조회일)</label>
                 <input type="date" id="alBaseDate">
               </div>
             </div>
@@ -190,12 +202,12 @@ CALCULATORS = [
                 <input type="number" id="alUnusedDays" min="0" max="40" step="0.5" value="5" placeholder="예: 5">
               </div>
             </div>
-            <p class="field-help" style="margin:0;">1일 통상임금 = 월 통상임금 ÷ 209시간 × 8시간 (주 40시간 기준 예상치)</p>
+            <p class="field-help" style="margin:0;">1일 통상임금 = 월 통상임금 ÷ 209시간 × 8시간 (주 40시간 기준 참고치)</p>
           </div>
 
           <div class="calc-card">
             <div class="calc-result-hero">
-              <div class="calc-result-label">기준일 현재 발생 연차유급휴가</div>
+              <div class="calc-result-label" id="alHeroLabel">기준일 현재 발생 연차유급휴가</div>
               <div class="calc-result-main" id="alHeroVal">총 15일</div>
               <div class="calc-result-sub" id="alHeroSub">근속연차 기준 산정</div>
             </div>
@@ -207,9 +219,9 @@ CALCULATORS = [
                 <div class="sub">입사일 ~ 기준일</div>
               </div>
               <div class="calc-stat-box">
-                <div class="lbl">현재 연차 일수</div>
+                <div class="lbl">인정 연차 일수</div>
                 <div class="val" id="alYearDaysVal">-</div>
-                <div class="sub">80% 이상 출근 기준</div>
+                <div class="sub">80% 이상 출근 가정</div>
               </div>
               <div class="calc-stat-box">
                 <div class="lbl">미사용 연차수당 예상</div>
@@ -218,6 +230,7 @@ CALCULATORS = [
               </div>
             </div>
 
+            <div id="alStatusAlert" class="guide-callout warn" style="display:none;margin:0 0 12px;font-size:13px;"></div>
             <p id="alFiscalNote" class="field-help" style="margin:0 0 10px;"></p>
 
             <div class="calc-table-wrap">
@@ -270,8 +283,12 @@ CALCULATORS = [
 <p>많은 회사가 인사 관리 편의를 위해 매년 1월 1일에 전 직원 연차를 일괄 부여(회계연도 기준)합니다. 하지만 근로기준법 원칙은 <strong>입사일 기준</strong>이므로, 퇴사할 때 회계연도 기준으로 받은 총 연차보다 입사일 기준 법정 연차가 더 많다면 <strong>부족한 일수만큼 추가로 연차수당을 청구</strong>할 수 있습니다.</p>
 
 <div class="guide-callout">
-  <strong>퇴사 준비 중이라면 함께 확인하세요</strong>
-  <a href="/guide/severance-pay-annual-leave/" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">퇴직금·미사용 연차수당 계산법과 14일 이내 미지급 대처 가이드</a> 및 <a href="/sajikseo/" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">무료 사직서 양식 작성기</a>에서 퇴사 절차를 한 번에 마무리하세요.
+  <strong>공식 법령 및 행정해석 근거</strong>
+  <ul style="margin:6px 0 0;padding-left:18px;">
+    <li><a href="https://www.law.go.kr/법령/근로기준법/제60조" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국가법령정보센터 — 「근로기준법」 제60조(연차 유급휴가)</a></li>
+    <li><a href="https://www.moel.go.kr/news/enews/report/enewsView.do?bbs_id=12&news_seq=13052" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">고용노동부 — 1년 기간제·만 1년 퇴직 시 연차유급휴가 변경 행정해석 안내</a></li>
+  </ul>
+  <p style="margin:8px 0 0;">퇴사 준비 중이라면 <a href="/guide/severance-pay-annual-leave/" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">퇴직금·미사용 연차수당 계산법과 14일 이내 미지급 대처 가이드</a> 및 <a href="/sajikseo/" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">무료 사직서 양식 작성기</a>도 함께 확인하세요.</p>
 </div>
 """,
         "faqs": [
@@ -430,6 +447,14 @@ CALCULATORS = [
   <li><strong>현금영수증 의무 발급 (소득공제 & 양도세 경비):</strong> 부동산 중개업은 10만 원 이상 현금 거래 시 현금영수증 의무 발급 업종입니다. 매매 복비 영수증은 추후 집을 팔 때 <strong>양도소득세 필요경비</strong>로 공제되므로 반드시 보관하세요.</li>
   <li><strong>간이과세자 부가세 확인:</strong> 간이과세자인 공인중개사는 일반과세자처럼 10%를 그대로 청구할 수 없으므로 사업자등록증 과세유형을 확인하세요.</li>
 </ol>
+
+<div class="guide-callout">
+  <strong>공식 법령 근거</strong>
+  <ul style="margin:6px 0 0;padding-left:18px;">
+    <li><a href="https://www.law.go.kr/법령/공인중개사법시행규칙" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국가법령정보센터 — 「공인중개사법 시행규칙」 제20조(중개보수 상한요율)</a></li>
+    <li><a href="https://www.molit.go.kr" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국토교통부 — 부동산 중개보수 요율 안내</a></li>
+  </ul>
+</div>
 """,
         "faqs": [
             ("부동산 복비에 부가세 10%는 무조건 내야 하나요?", "공인중개사가 '일반과세자'라면 중개보수의 10%를 부가세로 별도 청구할 수 있습니다. 반면 '간이과세자'는 10%를 청구할 수 없으며(세금계산서 발급 불가 간이과세자는 부가세 별도 청구 관행이 없거나 4% 이내), 계약 전 확인하시는 것이 좋습니다."),
@@ -486,12 +511,24 @@ CALCULATORS = [
                 <input type="number" id="sevAnnualPay" min="0" step="10000" value="0">
               </div>
             </div>
-            <div class="guide-callout" style="margin:12px 0 0;font-size:13px;" id="sevRuleNote"></div>
+            <hr style="border:none;border-top:1px solid var(--border);margin:12px 0;">
+            <div class="field-row">
+              <div class="field">
+                <label for="sevOrdinaryDaily">1일 통상임금 (선택, 원)</label>
+                <input type="number" id="sevOrdinaryDaily" min="0" step="1000" value="" placeholder="비우면 평균임금만 사용">
+              </div>
+              <div class="field">
+                <label for="sevExcludedDays">3개월 중 제외기간 (선택, 일)</label>
+                <input type="number" id="sevExcludedDays" min="0" max="92" step="1" value="0" placeholder="출산휴가·육아휴직 등">
+              </div>
+            </div>
+            <p class="field-help" style="margin:0 0 10px;">출산전후휴가·육아휴직·업무상 재해 휴업 등 제외기간(근로기준법 시행령 제2조)이 있으면 해당 일수를 입력하고, 3개월 급여에서도 해당 기간 임금을 제외해 입력하세요.</p>
+            <div class="guide-callout" style="margin:0;font-size:13px;" id="sevRuleNote"></div>
           </div>
 
           <div class="calc-card">
             <div class="calc-result-hero">
-              <div class="calc-result-label">세전 예상 법정 퇴직금</div>
+              <div class="calc-result-label">세전 예상 법정 퇴직금 (참고치)</div>
               <div class="calc-result-main" id="sevHeroVal">9,000,000원</div>
               <div class="calc-result-sub" id="sevHeroSub">근로자퇴직급여보장법 기준</div>
             </div>
@@ -502,9 +539,9 @@ CALCULATORS = [
                 <div class="sub">365일 이상 지급 대상</div>
               </div>
               <div class="calc-stat-box">
-                <div class="lbl">1일 평균임금</div>
+                <div class="lbl">적용 1일 기준임금</div>
                 <div class="val" id="sevAvgWageVal">97,826원</div>
-                <div class="sub">3개월 총임금 ÷ 3개월 일수</div>
+                <div class="sub" id="sevAvgWageSub">3개월 총임금 ÷ 3개월 일수</div>
               </div>
             </div>
             <div class="calc-cta-box">
@@ -529,11 +566,21 @@ CALCULATORS = [
 <ul>
   <li><strong>기본 공식:</strong> <code>1일 평균임금 × 30일 × (총 계속근로일수 ÷ 365)</code></li>
   <li><strong>1일 평균임금:</strong> 퇴직 전 3개월간 지급받은 임금 총액(세전)에 연간 상여금의 3/12 및 직전 연도 미사용 연차수당의 3/12을 더해 3개월 총 일수(89~92일)로 나눈 금액입니다.</li>
-  <li><strong>통상임금 하한 보호:</strong> 만약 퇴직 직전 무급휴가나 병가 등으로 1일 평균임금이 1일 통상임금보다 낮아진 경우, 근로기준법에 따라 <strong>1일 통상임금</strong>을 기준으로 퇴직금을 산정합니다.</li>
+  <li><strong>통상임금 하한 보호 (근로기준법 제2조 제2항):</strong> 퇴직 직전 무급휴가나 병가 등으로 1일 평균임금이 1일 통상임금보다 낮아진 경우, <strong>1일 통상임금</strong>을 기준으로 퇴직금을 산정합니다. 위 계산기에서 '1일 통상임금'을 함께 입력하면 자동으로 비교해 더 높은 금액을 적용합니다.</li>
+  <li><strong>평균임금 산정 제외기간 (근로기준법 시행령 제2조):</strong> 수습기간, 사용자 귀책 휴업, 출산전후휴가, 육아휴직, 업무상 부상·질병 요양 휴업, 쟁의행위 기간 등은 평균임금 산정 기간과 임금 총액에서 모두 제외합니다. 최근 3개월 전체가 제외기간에 해당하는 등 특수 사례는 고용노동부 공식 계산기로 산정하세요.</li>
 </ul>
 
 <h3>2. 퇴직금 지급 기한과 IRP 계좌 이전</h3>
 <p>사용자는 퇴직일로부터 <strong>14일 이내</strong>에 퇴직금을 지급해야 합니다. 2022년 4월 이후 퇴직금은 원칙적으로 근로자 본인의 <strong>개인형 퇴직연금(IRP) 계좌</strong>로 이전 지급되며(만 55세 이상, 퇴직금 300만 원 이하 등 예외 있음), 지연 시 연 20%의 지연이자를 청구할 수 있습니다.</p>
+
+<div class="guide-callout">
+  <strong>공식 법령 및 정부 계산기 출처</strong>
+  <ul style="margin:6px 0 0;padding-left:18px;">
+    <li><a href="https://www.moel.go.kr/retirementpayCal.do" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">고용노동부 — 공식 퇴직금 계산기</a></li>
+    <li><a href="https://www.law.go.kr/법령/근로자퇴직급여보장법" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국가법령정보센터 — 「근로자퇴직급여 보장법」</a></li>
+    <li><a href="https://www.law.go.kr/법령/근로기준법/제2조" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국가법령정보센터 — 「근로기준법」 제2조(평균임금·통상임금)</a></li>
+  </ul>
+</div>
 """,
         "faqs": [
             ("5인 미만 사업장이나 아르바이트생도 퇴직금을 받을 수 있나요?", "네, 퇴직금은 사업장 규모와 무관하게 1인 이상 모든 사업장에 적용됩니다. 주 15시간 이상 근무하며 1년(365일) 이상 계속 근로했다면 알바생도 법정 퇴직금을 받을 수 있습니다."),
@@ -605,7 +652,7 @@ CALCULATORS = [
 
           <div class="calc-card">
             <div class="calc-result-hero">
-              <div class="calc-result-label">예상 총 실업급여 수급액</div>
+              <div class="calc-result-label">예상 총 실업급여 수급액 (2026년 1월 1일 이후 이직자)</div>
               <div class="calc-result-main" id="ueHeroVal">9,907,200원</div>
               <div class="calc-result-sub" id="ueHeroSub">고용보험 구직급여 기준</div>
             </div>
@@ -613,7 +660,7 @@ CALCULATORS = [
               <div class="calc-stat-box">
                 <div class="lbl">1일 구직급여액</div>
                 <div class="val" id="ueDailyVal">66,048원</div>
-                <div class="sub">2026 상·하한액 적용</div>
+                <div class="sub" id="ueDailySub">2026 상한 68,100 / 하한 66,048</div>
               </div>
               <div class="calc-stat-box">
                 <div class="lbl">소정급여일수</div>
@@ -640,14 +687,22 @@ CALCULATORS = [
         </div>
         """,
         "guide_html": """
-<h2>2026년 실업급여(구직급여) 수급 조건 및 계산 기준</h2>
-<p>실업급여는 고용보험에 가입된 근로자가 비자발적 사유로 실직한 뒤 재취업 활동을 하는 기간에 소정의 급여를 지급하는 제도입니다.</p>
+<h2>2026년 실업급여(구직급여) 수급 조건 및 상·하한액 기준</h2>
+<p>실업급여(구직급여)는 고용보험에 가입된 근로자가 비자발적 사유로 실직한 뒤 재취업 활동을 하는 기간에 소정의 급여를 지급하는 제도입니다. <strong>2026년 1월 1일 이후 이직자</strong>부터 1일 상한액이 7년 만에 <strong>68,100원</strong>으로 인상되었으며, 1일 8시간 소정근로자 기준 하한액은 <strong>66,048원</strong>(2026년 최저시급 10,320원 × 80% × 8시간)입니다.</p>
+
+<table class="guide-table">
+  <thead><tr><th style="width:28%">2026년 구직급여 기준</th><th style="width:24%">1일 지급액</th><th>월 30일 환산 / 적용 대상</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1일 상한액</strong></td><td><strong>68,100원</strong></td><td>월 약 2,043,000원 (2026.01.01 이후 이직자)</td></tr>
+    <tr><td><strong>1일 하한액 (8시간)</strong></td><td><strong>66,048원</strong></td><td>월 약 1,981,440원 (단시간 근로자는 소정근로시간 비례)</td></tr>
+  </tbody>
+</table>
 
 <h3>1. 실업급여 수급 핵심 요건 3가지</h3>
 <ol>
   <li><strong>피보험단위기간 180일 이상:</strong> 이직일 이전 18개월(초단시간근로자는 24개월) 동안 유급 근로일수(주휴일 포함)가 통산 180일 이상이어야 합니다.</li>
   <li><strong>비자발적 이직 사유:</strong> 권고사직, 계약기간 만료, 정년퇴직, 폐업·도산, 또는 임금체불·왕복 3시간 이상 통근 곤란 등 고용보험법상 정당한 이직 사유에 해당해야 합니다.</li>
-  <li><strong>적극적 재취업 활동:</strong> 근로 의사와 능력을 가지고 워크넷(고용24) 구직등록 및 실업인정 절차를 이행해야 합니다.</li>
+  <li><strong>적극적 재취업 활동:</strong> 근로 의사와 능력을 가지고 고용24(work24.go.kr) 구직등록 및 실업인정 절차를 이행해야 합니다.</li>
 </ol>
 
 <h3>2. 연령 및 고용보험 가입기간별 소정급여일수</h3>
@@ -658,6 +713,15 @@ CALCULATORS = [
     <tr><td><strong>만 50세 이상 · 장애인</strong></td><td>120일</td><td>180일</td><td>210일</td><td>240일</td><td>270일</td></tr>
   </tbody>
 </table>
+
+<div class="guide-callout">
+  <strong>공식 법령 및 정부 안내 출처</strong>
+  <ul style="margin:6px 0 0;padding-left:18px;">
+    <li><a href="https://1350.moel.go.kr/rtmview.do?id=1000324861" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">고용노동부 고객상담센터(1350) — 2026년 구직급여 상·하한액 공식 안내</a></li>
+    <li><a href="https://www.work24.go.kr" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">고용24(work24.go.kr) — 실업급여 신청 및 공식 모의계산</a></li>
+    <li><a href="https://www.law.go.kr/법령/고용보험법" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국가법령정보센터 — 「고용보험법」 및 시행령</a></li>
+  </ul>
+</div>
 """,
         "faqs": [
             ("자진 퇴사(일신상의 사유)는 무조건 실업급여를 못 받나요?", "원칙적으로 자발적 이직은 불가하지만, 임금체불(최근 1년 내 2개월 이상), 사업장 이전으로 왕복 3시간 이상 통근 곤란, 질병으로 업무 수행 불가(의사 소견서+사업주 확인서), 직장 내 괴롭힘 등 예외 사유가 입증되면 수급 가능합니다."),
@@ -764,6 +828,14 @@ CALCULATORS = [
     <tr><td>주 40시간</td><td>8시간</td><td>82,560원</td><td>495,360원</td></tr>
   </tbody>
 </table>
+
+<div class="guide-callout">
+  <strong>공식 법령 및 고시 근거</strong>
+  <ul style="margin:6px 0 0;padding-left:18px;">
+    <li><a href="https://www.law.go.kr/법령/근로기준법/제55조" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">국가법령정보센터 — 「근로기준법」 제55조(휴일)</a></li>
+    <li><a href="https://www.minimumwage.go.kr" target="_blank" rel="noopener noreferrer" style="color:var(--brand-blue);font-weight:700;text-decoration:underline;">최저임금위원회 — 2026년 최저임금(시간급 10,320원) 공식 고시</a></li>
+  </ul>
+</div>
 """,
         "faqs": [
             ("5인 미만 작은 카페나 편의점 알바도 주휴수당을 받나요?", "네, 주휴수당은 근로기준법상 상시근로자 수와 무관하게 1인 이상 모든 사업장에 의무 적용됩니다."),
