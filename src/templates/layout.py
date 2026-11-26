@@ -112,6 +112,7 @@ def build_base_html(
   <meta name="robots" content="{robots_content}">
   <meta name="author" content="{cfg['site_name']}">
   <link rel="canonical" href="{canonical}">
+  <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
   <meta name="theme-color" content="#1B365D">
 
